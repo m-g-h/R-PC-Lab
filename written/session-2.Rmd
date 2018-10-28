@@ -1,0 +1,25 @@
+---
+title: "session-2"
+output:
+  html_document:
+    toc: true
+    toc_float: false
+    number_sections: true
+---
+
+# fundamentals of Probability
+1. Random Variables
+- Notational Remarks ($X$ or $x_i$, and what about $Y$?)
+- $pdf$ and $cdf$
+2. Joint and Conditional Distributions, Independence
+- Joint $pdf$, marginal $pdf$
+3. Features of Probability Distributions
+- Expected Value, Variance, Standard Deviation, 
+- Standardising
+- Skewness and Kurtosis
+4. Features of Joint and Conditional Distributions
+- Covariance, Correlation
+- Variance of Sumsof Variables
+- Conditional Expectation
+- Conditional Variance
+
