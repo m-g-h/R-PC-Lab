@@ -7,7 +7,30 @@ output:
     number_sections: true
 ---
 
-# fundamentals of Probability
+# Section
+## Subsection
+### Subsubsection
+
+- Bullet1
+- Bullet2
+    - Subbullet 1
+    - Subbullet 2
+- Bullet3
+
+1. Numbered1
+2. Numbered2
+
+
+Code Chunk, insert with strg-alt-i
+```{r}
+plot(mtcars$mpg)
+```
+
+Formulas : $ \LaTeX = nice $
+$$ \LaTeX = nice $$
+
+
+# Fundamentals of Probability
 1. Random Variables
 - Notational Remarks ($X$ or $x_i$, and what about $Y$?)
 - $pdf$ and $cdf$
@@ -22,4 +45,5 @@ output:
 - Variance of Sumsof Variables
 - Conditional Expectation
 - Conditional Variance
+5. Normal and other Distributions
 
