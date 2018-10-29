@@ -33,6 +33,13 @@ $$ \LaTeX = nice $$
 # Fundamentals of Probability
 1. Random Variables
 - Notational Remarks ($X$ or $x_i$, and what about $Y$?)
+    - $X$ is a random variable, $x$ is a particular outcome.
+- Discrete and continuous random variables
+    - Discrete random variables are variables which can only take a countable number of values. For example, throwing a  die represents a random variable.  
+    Let $D$ be a random variable with outcomes $j = 1, 2, 3, 4, 5, 6$, then:
+    $p_j = P(D = d_j), j = 1, 2, 3, 4, 5, 6$, and  
+    $p_1 + p_2 + ... + p_6 = 1$.  
+    This reads "The Probability of $D$ to take $d_j$ is $p_j$". Each $p_j$ is between $0$ and $1$ and all of them add up to $1$. If the die is fair, each $p_j$ is $\frac{1}{6}$
 - $pdf$ and $cdf$
 2. Joint and Conditional Distributions, Independence
 - Joint $pdf$, marginal $pdf$
@@ -42,7 +49,7 @@ $$ \LaTeX = nice $$
 - Skewness and Kurtosis
 4. Features of Joint and Conditional Distributions
 - Covariance, Correlation
-- Variance of Sumsof Variables
+- Variance of Sums of Variables
 - Conditional Expectation
 - Conditional Variance
 5. Normal and other Distributions
