@@ -232,7 +232,7 @@ where $y$ is the regressand and $x$ the regressor. $\epsilon$ denotes the error 
 ## Explanation by example
 Now what does a linear regression model tell us? It tells us the relation between two variables and in the best case lets us predict the outcome if we have information about the independent variable. Assume that we have ten students who took exams in statistics and exams in econometrics. We know what grades were in percentage points. Now, we would like to predict the econometrics grade of any other student who took the statistics exam. Our model is as follows:
 
-$$econgrade = \beta_0 + \beta_{1statsgrade}+ \epsilon$$
+$$econgrade = \beta_0 + \beta_1statsgrade + \epsilon$$
 
 ```{r fig.height=4, fig.width=9}
 library(ggplot2)
@@ -244,28 +244,32 @@ ggplot(grades_df, aes(x, y)) +
   geom_point() + labs(x="Statistics Grade", y="Econometrics Grade") + geom_smooth(
     method="lm", colour="red", se=T, alpha=0.1) + theme_minimal()
 ```
-We see that the students with better statistics grades also achieved better econometrics grade. In fact, we could calculate the line's slope and then we'd know by how much the econometrics grade increases if the statistics grade is increased by 1. 
-But to infer from this model to the general population and to find out whether or not this could be a causal relationship, we need to know more than this.
+```{r}
+summary(lm(y~x, data=grades_df))$coefficients
+```
+Judging from the graph, we have a clear linear relationship between the students' statistics grades and the econometrics grades. In fact, our $\beta_1$, which is also the line's slope, can be read from the summary ($0.939$) and from the Pr-column we also see that this estimate is different from zero (statistically significant, ***). A standard interpretation of this information would go as follows: "Ceteris paribus (with all else being equal, an increase of $1$ of the statistics grade implies an increase of $0.939$ of the econometrics grade. Given the t value which is above our given threshold of $1.96$, we would reject our null hypothesis that the influence of the statistics grade is equal to $0$." We may go even as far and state that if a current student in the econometrics class has achieved a grade of $90$, he will approximately score $87$ points in the econometrics exam.  But we have an essential problem with this interpretation, because we do not actually know that we have a causal relationship here or just a correlation. And right now, we do not know whether the line we drew represents the best guess for a prediction. To answer these questions, we need to know more.
+
 
 ## Law of Iterated Expectations
-To proceed, we have to have a short look at the Law of Iterated Expectations (LEI). It states that the Expectation of $y$ given $x$ is equal to the expectation of $y$:
+We will shortly learn under which conditions we can assume that we're looking at a causal relationship of $x$ on $y$. But before we do that, we need to know and understand the Law of Iterated Expectations (LEI). It states that the Expectation of $y$ given $x$ is equal to the expectation of $y$:
 $$\mathbb{E}\left[Y\right] = \mathbb{E}\left[\mathbb{E}\left[Y|X\right]\right]$$
 To get an idea why this holds, consider a game of darts being played in another room and you want to guess the landing spot of a dart. Let $Y$ denote this spot. Without any prior information, our best guess for the value $Y$ takes on would be the center $c$ of the board: $$\mathbb{E}\left[Y\right] = c$$
-Now suppose that every time a dart is thrown, someone watching in the other room tells us whether the dart landed in the upper or lower half of the board. Let this be another random variable $X$. By the information of $X$ we can improve our guess for the landing spot - if $X = upper$, then our best guess for $Y$ might be the center of the upper half of the board, $\mathbb{E}\left[Y|X = up\right] = c^{upper}$, if $X = lower$, then our best guess for $Y$ would be the center of the lower half of the board, $\mathbb{E}\left[Y|X = low\right] = c^{lower}$
+Now suppose that every time a dart is thrown, someone watching in the other room tells us whether the dart landed in the upper or lower half of the board. Let this be another random variable $X$. By the information of $X$ we can improve our guess for the landing spot - if $X = upper$, then our best guess for $Y$ might be the center of the upper half of the board, $\mathbb{E}\left[Y|X = \text{upper}\right] = c^{\text{upper}}$, if $X = lower$, then our best guess for $Y$ would be the center of the lower half of the board, $\mathbb{E}\left[Y|X = \text{lower}\right] = c^{\text{lower}}$
 Thus, the expectation of $Y$ conditional on $X$ depends on whether $X = up$ or $X = low$. But since $X$ is a random variable, $\mathbb{E}\left[Y|X\right]$ is also a random variable.
 When iterating Expectations like $\mathbb{E}\left[\mathbb{E}\left[Y|X\right]\right]$ we take expectations over the random variable $\mathbb{E}\left[Y|X\right]$, i.e., averaging the two best guesses of $X$ (upper and lower). When averaging those guesses proportional to how likely each $X$ outcome will be, then we expect that the averaged guess $\mathbb{E}\left[\mathbb{E}\left[Y|X\right]\right]$ agrees with the overall "direct" best guess $\mathbb{E}\left[Y\right]$
 
 Credits to Jimmy Jin for the great intuition behind the LEI.
 
-<span style="color:red">INCLUDE PROOF HERE</span>This can also be mathematically proven by:
-
 ## Causal interpretation
-For a regression to be more than a simple correlation, one has to make assumptions how $x$ is related to the error term $\epsilon$. For causal interpretations, $x$ must not include information about $\epsilon$, that is, they must not be correlated. Mathematically speaking: $$\mathbb{E} \left[\epsilon|x\right] = 0$$
-If this holds, we have **exogeneity**. In the example with the statistics and econometrics grade, we obviously do not have exogeneity, as the statistics grade is for example also highly correlated with the number of hours spend studying, which the model does not explicitly include.
+For a regression to be more than a simple correlation, one has to make assumptions how $x$ is related to the error term $\epsilon$. For causal interpretations, $x$ must not include information about $\epsilon$, that is, they must not be correlated. If they would be correlated, it is still possible that something else than $x$ predicts $y$. Mathematically speaking: $$\mathbb{E} \left[\epsilon|x\right] = 0$$
+This is called the **zero conditional mean assumption**. If it holds, we have **exogeneity**. In the example with the statistics and econometrics grade, we obviously do not have exogeneity, as the statistics grade is for example also highly correlated with the number of hours spend studying, that may also affect the econometrics grade. In this case, $\mathbb{E}\left[\epsilon|statsgrade\right] \neq 0$
+
+Following from this and the Law of Iterated Expectations: $$\begin{aligned}\mathbb{E} \left[\epsilon|x\right] &= \mathbb{E}\left[\epsilon\right] = 0\text{,}\end{aligned}$$ therefore: $$\begin{aligned}Cov\left[x, \epsilon\right] &= \mathbb{E}\left[x\epsilon\right] - \mathbb{E}\left[X\right] \mathbb{E}\left[\epsilon\right]  = 0\end{aligned}$$
+
+Effectively, if the expected value of the error term is zero, the model is without error and thus average value of $y$ can be expressed as a linear function of $x$:
+$$\begin{aligned}\mathbb{E}\left[y|x\right] &= \mathbb{E}\left[\beta_0 + \beta_1x + \epsilon|x\right] \\ &= \beta_0 + \beta_1x + \mathbb{E}\left[\epsilon|x\right] \\ &= \beta_0 + \beta_1x \end{aligned}$$
 
 
-Following from this and the Law of Iterated Expectations: $$\mathbb{E} \left[\epsilon|x\right] = \mathbb{E}\left[\epsilon\right] = 0$$, therefore $$cov\left[x, \epsilon\right] = \mathbb{E}\left[x\epsilon\right] = 0$$
-Effectively, if the expected value of the error term is zero, the model quite accurately predicts the outcome.
 
 ## Assumptions
 
@@ -277,7 +281,4 @@ Before interpreting SLR models, one should be aware of its assumptions, namely:
 5. Homoskedasticity (Equality of variances) is given: $$Var\left[\epsilon|x\right] = Var\left[\epsilon_i|x_i\right] = \sigma^2$$
 
 Note that this only holds as long as the the assumption of independence is met, i.e. $\frac{\delta \epsilon}{\delta x} = 0$
-
-
-
 
