@@ -15,7 +15,7 @@ Blabla this section introduces you to bla
 # Random Variables
 Random variables are variables that take on numerical values and are determined by experiments. Mathematically speaking, probability experiments (or trials) are procedures which can be infinitely repeated and which have a well-defined set of possible outcomes. These outcomes are affected by chance.
 
-Take for example a simple coin toss experiment. The outcomes are well defined by $\{heads, tails\}$ which we we can assign (recode) to $\{0,1\}$ meaning "no heads" and "heads". The variable for the outcome will be denoted by $X$. Now, unless we perform a cointoss, the value $X$ takes on remains essentially *random*
+Take for example a simple coin toss experiment. The outcomes are well defined by $\{heads, tails\}$ which we we can assign (recode) to $\{0,1\}$ meaning "no heads" and "heads". The variable for the outcome will be denoted by $X$. Now, unless we perform a cointoss, the value $X$ takes on remains essentially *random*.
 
 
 
@@ -224,3 +224,60 @@ The variance and standard deviation are both dependent on their units of measure
 $$  Corr[X,Y] = \frac{Cov[X,Y]}{sd[X] sd[Y]} = \frac{\sigma_{XY}}{\sigma_X \sigma_Y}$$
 
 - The population correlation coefficient is usually denoted as $\rho$ or $\rho_{XY}$ instead of $Corr[X,Y]$
+
+# Simple Linear Regression and OLS
+Now that we have learned about correlation and testing, we want to predict one variable from another. One simple way to do so is using linear regression. Simple linear regression (SLR) is about predicting a dependent variable (*regressand*) from one independent variable (*regressor*). A SLR model is given by: $$y = \beta_0 + \beta_1x + \epsilon$$
+where $y$ is the regressand and $x$ the regressor. $\epsilon$ denotes the error of the model, i.e. the residuals. Usually, researchers are interested in the amount of change in $y$ that occur when $x$ changes. As in any linear function, the rate of change is given by $\beta_1$. More formally: $$\frac{\delta y}{\delta x} = \beta_1$$
+
+## Explanation by example
+Now what does a linear regression model tell us? It tells us the relation between two variables and in the best case lets us predict the outcome if we have information about the independent variable. Assume that we have ten students who took exams in statistics and exams in econometrics. We know what grades were in percentage points. Now, we would like to predict the econometrics grade of any other student who took the statistics exam. Our model is as follows:
+
+$$econgrade = \beta_0 + \beta_{1statsgrade}+ \epsilon$$
+
+```{r fig.height=4, fig.width=9}
+library(ggplot2)
+student_id = c(1,2,3,4,5)
+x = c(95,85,80,73,70,65,60,58,55,51)
+y = c(85,95,75,70,65,70,62,53,52,51)
+grades_df = data.frame(student_id, x, y)
+ggplot(grades_df, aes(x, y)) + 
+  geom_point() + labs(x="Statistics Grade", y="Econometrics Grade") + geom_smooth(
+    method="lm", colour="red", se=T, alpha=0.1) + theme_minimal()
+```
+We see that the students with better statistics grades also achieved better econometrics grade. In fact, we could calculate the line's slope and then we'd know by how much the econometrics grade increases if the statistics grade is increased by 1. 
+But to infer from this model to the general population and to find out whether or not this could be a causal relationship, we need to know more than this.
+
+## Law of Iterated Expectations
+To proceed, we have to have a short look at the Law of Iterated Expectations (LEI). It states that the Expectation of $y$ given $x$ is equal to the expectation of $y$:
+$$\mathbb{E}\left[Y\right] = \mathbb{E}\left[\mathbb{E}\left[Y|X\right]\right]$$
+To get an idea why this holds, consider a game of darts being played in another room and you want to guess the landing spot of a dart. Let $Y$ denote this spot. Without any prior information, our best guess for the value $Y$ takes on would be the center $c$ of the board: $$\mathbb{E}\left[Y\right] = c$$
+Now suppose that every time a dart is thrown, someone watching in the other room tells us whether the dart landed in the upper or lower half of the board. Let this be another random variable $X$. By the information of $X$ we can improve our guess for the landing spot - if $X = upper$, then our best guess for $Y$ might be the center of the upper half of the board, $\mathbb{E}\left[Y|X = up\right] = c^{upper}$, if $X = lower$, then our best guess for $Y$ would be the center of the lower half of the board, $\mathbb{E}\left[Y|X = low\right] = c^{lower}$
+Thus, the expectation of $Y$ conditional on $X$ depends on whether $X = up$ or $X = low$. But since $X$ is a random variable, $\mathbb{E}\left[Y|X\right]$ is also a random variable.
+When iterating Expectations like $\mathbb{E}\left[\mathbb{E}\left[Y|X\right]\right]$ we take expectations over the random variable $\mathbb{E}\left[Y|X\right]$, i.e., averaging the two best guesses of $X$ (upper and lower). When averaging those guesses proportional to how likely each $X$ outcome will be, then we expect that the averaged guess $\mathbb{E}\left[\mathbb{E}\left[Y|X\right]\right]$ agrees with the overall "direct" best guess $\mathbb{E}\left[Y\right]$
+
+Credits to Jimmy Jin for the great intuition behind the LEI.
+
+<span style="color:red">INCLUDE PROOF HERE</span>This can also be mathematically proven by:
+
+## Causal interpretation
+For a regression to be more than a simple correlation, one has to make assumptions how $x$ is related to the error term $\epsilon$. For causal interpretations, $x$ must not include information about $\epsilon$, that is, they must not be correlated. Mathematically speaking: $$\mathbb{E} \left[\epsilon|x\right] = 0$$
+If this holds, we have **exogeneity**. In the example with the statistics and econometrics grade, we obviously do not have exogeneity, as the statistics grade is for example also highly correlated with the number of hours spend studying, which the model does not explicitly include.
+
+
+Following from this and the Law of Iterated Expectations: $$\mathbb{E} \left[\epsilon|x\right] = \mathbb{E}\left[\epsilon\right] = 0$$, therefore $$cov\left[x, \epsilon\right] = \mathbb{E}\left[x\epsilon\right] = 0$$
+Effectively, if the expected value of the error term is zero, the model quite accurately predicts the outcome.
+
+## Assumptions
+
+Before interpreting SLR models, one should be aware of its assumptions, namely:
+1. The population model is linear in its parameters: $$y = \beta_0 + \beta_1x + \epsilon$$
+2. Random bla  
+3. There is variation in the $x_i$: $$\sum_{i=1}^n (x_i - \bar{x})^2 > 0$$
+4. $\mathbb{E} \left[\epsilon|x\right] = 0$ and therefore $\mathbb{E} \left[\epsilon_i|x_i\right] = 0$
+5. Homoskedasticity (Equality of variances) is given: $$Var\left[\epsilon|x\right] = Var\left[\epsilon_i|x_i\right] = \sigma^2$$
+
+Note that this only holds as long as the the assumption of independence is met, i.e. $\frac{\delta \epsilon}{\delta x} = 0$
+
+
+
+
