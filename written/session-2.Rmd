@@ -13,21 +13,41 @@ output:
 Blabla this section introduces you to bla
 
 # Random Variables
-Random variables are variables that take on numerical values and are determined by experiments. Mathematically speaking, probability experiments (or trials) are procedures which can be infinitely repeated and which have a well-defined set of possible outcomes. These outcomes are affected by chance. This shall be explained by an example. The simplest probability experiment is certainly the coin toss. In theory, it can be infinitely repeated and it also has a well-defined set of outcomes, namely heads or tails. Now lets assign the value $1$ to heads and $0$ to tails. So our variable, let's call it $X$ can take on either $1$ or $0$ but unless we perform an experiment (a coin toss!), the value it takes on remains essentially *random*, i.e. it is determined by chance.
+Random variables are variables that take on numerical values and are determined by experiments. Mathematically speaking, probability experiments (or trials) are procedures which can be infinitely repeated and which have a well-defined set of possible outcomes. These outcomes are affected by chance.
+
+Take for example a simple coin toss experiment. The outcomes are well defined by $\{heads, tails\}$ which we we can assign (recode) to $\{0,1\}$ meaning "no heads" and "heads". The variable for the outcome will be denoted by $X$. Now, unless we perform a cointoss, the value $X$ takes on remains essentially *random*
+
+
 
 ## A few notational remarks
-We normally denote a random variable by a capital letter such as $X$ or $Y$. We use small letters $x$ or $y$ when we talk about realisations of $X$ or $Y$, i.e. observations that we have made by performing an experiment. For example, when $X$ is our variable for the possible outcomes of a coin toss, and we perform a coin toss, $x$ denotes a particular outcome of $X$, for example, $1$, or heads, respectively.
-Looking at different experiments of the same kind
+Consider the vector $X_i = (X_1 , X_2, \dots, X_{100})$ which contains the results from a fair coinflip. Using the `rbinom` function we simulate `n = 100` cointosses and obtain a vector of results $x_i = (x_1, x_2, \dots, x_{100})$ :
 
+```{r}
+X <- rbinom(n = 100, size = 1, prob = 0.5)
 
- - Notational Remarks ($X$ or $x_i$, and what about $Y$?)
-    - $X$ is a random variable, $x$ is a particular outcome.
+print(X)
+
+```
+ 
+If we would additionally conduct another experiment where we count two successive coin tosses (`size = 2`), we would obtain a secon random variable, which we would denote by $Y_i$ and $y_i$ respectively.
+
+**Notation:**
+
+- Use **capital letters** such as $O$ or $P$ to denote a **random variable**
+- Use **small letters** such as $m$ or $n$ to denote **particual outcomes** of $M$ and $N$
+- Use **subscripts** (e.g. $a_i$) to distinct **different instances** of the same random variable
 
 ## Discrete random variables
-Discrete random variables are variables which can only take a countable number of values. For example, throwing a  die represents a random variable. For this example, let $D$ be a random variable with outcomes $j = 1, 2, 3, 4, 5, 6$, then:  
-$$p_j = P(D = d_j), j = 1, 2, 3, 4, 5, 6$$  
-with $p_1 + p_2 + ... + p_6 = 1$.  
-This reads "The Probability of $D$ to take $d_j$ is $p_j$". Each $p_j$ is between $0$ and $1$ and all of them add up to $1$. Why? Because there is a certain probability for every side of a die that it will be thrown, and if you add those probabilities together, they have to add up to 100%! Obviously, the probability of throwing a 7 with a common 6-side die is 0%. If the die is fair, each $p_j$ is $\frac{1}{6}$
+Discrete random variables are variables which can only take a countable number of values. For our cointoss example, $X$ is a random variable with $j = 2$ outcomes, $\{0, 1\}$ (no head, head). Then the probability of each outcome is:
+
+$$p_j = P(X = x_j), \; j = 1, 2 \qquad \text{with } p_1 + p_2 = 1$$  
+
+### Example:drawing a card and predicting its symbol 
+
+- Denote the random variable for the card draw by $C$
+- We have $j = 4$ possible outcomes for $C$, $\{hearts, spades, clubs, diamonds\}$
+- The probabilities are denoted as: $p_j = P(C = c_j), \; j= 1, 2, \dots , 4$
+- Since we know that each symbol is represented equally in the deck, $p_j = 0.25$ for all $j$.
 
 # Probability Density Functions and Cumulative Density Functions
 

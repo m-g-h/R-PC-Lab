@@ -129,7 +129,9 @@ $(document).ready(function () {
 <li><a href="#hello"><span class="toc-section-number">1</span> Hello</a></li>
 <li><a href="#random-variables"><span class="toc-section-number">2</span> Random Variables</a><ul>
 <li><a href="#a-few-notational-remarks"><span class="toc-section-number">2.1</span> A few notational remarks</a></li>
-<li><a href="#discrete-random-variables"><span class="toc-section-number">2.2</span> Discrete random variables</a></li>
+<li><a href="#discrete-random-variables"><span class="toc-section-number">2.2</span> Discrete random variables</a><ul>
+<li><a href="#exampledrawing-a-card-and-predicting-its-symbol"><span class="toc-section-number">2.2.1</span> Example:drawing a card and predicting its symbol</a></li>
+</ul></li>
 </ul></li>
 <li><a href="#probability-density-functions-and-cumulative-density-functions"><span class="toc-section-number">3</span> Probability Density Functions and Cumulative Density Functions</a></li>
 <li><a href="#features-of-probability-distributions"><span class="toc-section-number">4</span> Features of Probability Distributions</a><ul>
@@ -160,23 +162,38 @@ $(document).ready(function () {
 </div>
 <div id="random-variables" class="section level1">
 <h1><span class="header-section-number">2</span> Random Variables</h1>
-<p>Random variables are variables that take on numerical values and are determined by experiments. Mathematically speaking, probability experiments (or trials) are procedures which can be infinitely repeated and which have a well-defined set of possible outcomes. These outcomes are affected by chance. This shall be explained by an example. The simplest probability experiment is certainly the coin toss. In theory, it can be infinitely repeated and it also has a well-defined set of outcomes, namely heads or tails. Now lets assign the value <span class="math inline">\(1\)</span> to heads and <span class="math inline">\(0\)</span> to tails. So our variable, let’s call it <span class="math inline">\(X\)</span> can take on either <span class="math inline">\(1\)</span> or <span class="math inline">\(0\)</span> but unless we perform an experiment (a coin toss!), the value it takes on remains essentially <em>random</em>, i.e. it is determined by chance.</p>
+<p>Random variables are variables that take on numerical values and are determined by experiments. Mathematically speaking, probability experiments (or trials) are procedures which can be infinitely repeated and which have a well-defined set of possible outcomes. These outcomes are affected by chance.</p>
+<p>Take for example a simple coin toss experiment. The outcomes are well defined by <span class="math inline">\(\{heads, tails\}\)</span> which we we can assign (recode) to <span class="math inline">\(\{0,1\}\)</span> meaning “no heads” and “heads”. The variable for the outcome will be denoted by <span class="math inline">\(X\)</span>. Now, unless we perform a cointoss, the value <span class="math inline">\(X\)</span> takes on remains essentially <em>random</em></p>
 <div id="a-few-notational-remarks" class="section level2">
 <h2><span class="header-section-number">2.1</span> A few notational remarks</h2>
-<p>We normally denote a random variable by a capital letter such as <span class="math inline">\(X\)</span> or <span class="math inline">\(Y\)</span>. We use small letters <span class="math inline">\(x\)</span> or <span class="math inline">\(y\)</span> when we talk about realisations of <span class="math inline">\(X\)</span> or <span class="math inline">\(Y\)</span>, i.e. observations that we have made by performing an experiment. For example, when <span class="math inline">\(X\)</span> is our variable for the possible outcomes of a coin toss, and we perform a coin toss, <span class="math inline">\(x\)</span> denotes a particular outcome of <span class="math inline">\(X\)</span>, for example, <span class="math inline">\(1\)</span>, or heads, respectively. Looking at different experiments of the same kind</p>
+<p>Consider the vector <span class="math inline">\(X_i = (X_1 , X_2, \dots, X_{100})\)</span> which contains the results from a fair coinflip. Using the <code>rbinom</code> function we simulate <code>n = 100</code> cointosses and obtain a vector of results <span class="math inline">\(x_i = (x_1, x_2, \dots, x_{100})\)</span> :</p>
+<pre class="r"><code>X &lt;- rbinom(n = 100, size = 1, prob = 0.5)
+
+print(X)</code></pre>
+<pre><code>##   [1] 1 0 0 1 1 1 1 1 0 0 1 1 1 0 1 0 0 0 1 1 1 0 1 0 1 0 1 0 1 1 1 1 0 0 0
+##  [36] 0 1 0 1 0 0 1 0 1 1 1 0 1 1 1 1 0 0 1 1 1 0 1 1 0 0 0 1 1 0 0 1 0 0 0
+##  [71] 0 0 1 0 0 1 1 1 0 0 1 0 0 0 1 0 1 0 0 1 1 0 0 1 1 1 1 0 1 1</code></pre>
+<p>If we would additionally conduct another experiment where we count two successive coin tosses (<code>size = 2</code>), we would obtain a secon random variable, which we would denote by <span class="math inline">\(Y_i\)</span> and <span class="math inline">\(y_i\)</span> respectively.</p>
+<p><strong>Notation:</strong></p>
 <ul>
-<li>Notational Remarks (<span class="math inline">\(X\)</span> or <span class="math inline">\(x_i\)</span>, and what about <span class="math inline">\(Y\)</span>?)
-<ul>
-<li><span class="math inline">\(X\)</span> is a random variable, <span class="math inline">\(x\)</span> is a particular outcome.</li>
-</ul></li>
+<li>Use <strong>capital letters</strong> such as <span class="math inline">\(O\)</span> or <span class="math inline">\(P\)</span> to denote a <strong>random variable</strong></li>
+<li>Use <strong>small letters</strong> such as <span class="math inline">\(m\)</span> or <span class="math inline">\(n\)</span> to denote <strong>particual outcomes</strong> of <span class="math inline">\(M\)</span> and <span class="math inline">\(N\)</span></li>
+<li>Use <strong>subscripts</strong> (e.g. <span class="math inline">\(a_i\)</span>) to distinct <strong>different instances</strong> of the same random variable</li>
 </ul>
 </div>
 <div id="discrete-random-variables" class="section level2">
 <h2><span class="header-section-number">2.2</span> Discrete random variables</h2>
-<p>Discrete random variables are variables which can only take a countable number of values. For example, throwing a die represents a random variable. For this example, let <span class="math inline">\(D\)</span> be a random variable with outcomes <span class="math inline">\(j = 1, 2, 3, 4, 5, 6\)</span>, then:<br />
-<span class="math display">\[p_j = P(D = d_j), j = 1, 2, 3, 4, 5, 6\]</span><br />
-with <span class="math inline">\(p_1 + p_2 + ... + p_6 = 1\)</span>.<br />
-This reads “The Probability of <span class="math inline">\(D\)</span> to take <span class="math inline">\(d_j\)</span> is <span class="math inline">\(p_j\)</span>”. Each <span class="math inline">\(p_j\)</span> is between <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span> and all of them add up to <span class="math inline">\(1\)</span>. Why? Because there is a certain probability for every side of a die that it will be thrown, and if you add those probabilities together, they have to add up to 100%! Obviously, the probability of throwing a 7 with a common 6-side die is 0%. If the die is fair, each <span class="math inline">\(p_j\)</span> is <span class="math inline">\(\frac{1}{6}\)</span></p>
+<p>Discrete random variables are variables which can only take a countable number of values. For our cointoss example, <span class="math inline">\(X\)</span> is a random variable with <span class="math inline">\(j = 2\)</span> outcomes, <span class="math inline">\(\{0, 1\}\)</span> (no head, head). Then the probability of each outcome is:</p>
+<p><span class="math display">\[p_j = P(X = x_j), \; j = 1, 2 \qquad \text{with } p_1 + p_2 = 1\]</span></p>
+<div id="exampledrawing-a-card-and-predicting-its-symbol" class="section level3">
+<h3><span class="header-section-number">2.2.1</span> Example:drawing a card and predicting its symbol</h3>
+<ul>
+<li>Denote the random variable for the card draw by <span class="math inline">\(C\)</span></li>
+<li>We have <span class="math inline">\(j = 4\)</span> possible outcomes for <span class="math inline">\(C\)</span>, <span class="math inline">\(\{hearts, spades, clubs, diamonds\}\)</span></li>
+<li>The probabilities are denoted as: <span class="math inline">\(p_j = P(C = c_j), \; j= 1, 2, \dots , 4\)</span></li>
+<li>Since we know that each symbol is represented equally in the deck, <span class="math inline">\(p_j = 0.25\)</span> for all <span class="math inline">\(j\)</span>.</li>
+</ul>
+</div>
 </div>
 </div>
 <div id="probability-density-functions-and-cumulative-density-functions" class="section level1">
@@ -257,7 +274,7 @@ Cov[X,Y] &amp;= \mathbb{E}[XY] - \mathbb{E}[X] \mathbb{E}[Y] \\
 &amp;= 0 &amp; \text{since } \mathbb{E}[XY] = \mathbb{E}[X] \mathbb{E}[X] 
 \end{aligned}\]</span></p></li>
 <li><p>Variance of linear combinations: <span class="math display">\[ Cov[a_1 X + b_1, a_2Y + b_2] =  a_1 a_2 Cov[X,Y]\]</span></p></li>
-<li><p>The boundary of the covariance of thwo random variables (its most extreme value) is given by the product of their standard deviations. This is also called the <em>Cauchy-Schwartz inequality</em>: <span class="math display">\[ |Cov[X,Y]| \leq sd[X] sd[Y] \]</span></p></li>
+<li><p>The boundary of the covariance of two random variables (its most extreme value) is given by the product of their standard deviations. This is also called the <em>Cauchy-Schwartz inequality</em>: <span class="math display">\[ |Cov[X,Y]| \leq sd[X] sd[Y] \]</span></p></li>
 </ul>
 </div>
 <div id="the-correlation-coefficient" class="section level3">
