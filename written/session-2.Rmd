@@ -52,39 +52,40 @@ $$p_j = P(X = x_j), \; j = 1, 2 \qquad \text{with } p_1 + p_2 = 1$$
 # Probability Density Functions and Cumulative Density Functions
 
 # Features of Probability Distributions
-Probability distributions have many features and can be described in many ways, but for our purposes of statistics and econometrics a focus on three basic features is sufficient:
 
-  1. Measures of Central Tendency
-  2. Measures of Variability (or Spread)
-  3. Measures of Association between two random Variables
+## Central Tendency: The Expected Value
 
-These are the building blocks of statistical theories and concepts An understanding on how they work and how they can be manipulated is required for adeqaute understanding on a beginner and also on an advanced level.
+The most commonly used feature of a probability distribution is the *expected value*. It splits the probability under the *pdf* in half.
 
-## A Measure of Central Tendency: The Expected Value
+> The expected value is the value from a probability distribution, for which the probabilities of another value being greater or smaller than it are exactly equal.
 
-The expected value is a measure of central tendency, meaning that the realisations of a random variable tend to cluster around it.
-
-Speaking in probabilities, for a given probability distribution the expected value denotes the value for which it holds that the likelihood of another value being greater or smaller is the same. This can also be represented graphically: the expected value splits the probability under the pdf in half:
-
-```{r echo=FALSE, fig.height=4.5, fig.width=4}
+For example, we simulate a random variable $R$ from a standard normal distribution. First, we simulate the variable and draw a histogram with the arithmetic mean:
+```{r fig.height=4, fig.width=9}
 library(ggplot2)
-library(tibble)
+set.seed(1337) #seed for reproducibility
+data <- data.frame(R = rnorm(n = 1000000))
 
-mean = 1
-data <- tibble(x = seq(mean - 3, mean + 3, by = 0.10),
-               y = dnorm(x, mean = mean))
-
-
-ggplot(data = data, aes(x = x)) +
-  geom_line(aes(y = y), size = 2) + 
-  geom_vline(aes(xintercept = sum(x * y)*0.1) , col = "red", show.legend = F, size = 2) +
+ggplot(data, aes(x = R)) +
+  geom_histogram(aes(y = ..density..), bins = 200) + 
+  geom_vline(xintercept = mean(data$R), color="red") +
   theme_minimal()
-  
 ```
 
-The expected value is usually denoted as $\mu$ or $\mu_X$.
+It looks like the area to the left of the mean is the same size at the area on the right side. Let's check that:
 
-### Rules for calculating expected values
+```{r}
+A <- numeric() # Variable for storing the area sizes
+
+A[1] <- (sum (abs (data$R[data$R < mean(data$R)]))) /sum(abs(data$R)) # Area to the left of the mean in percent
+A[2] <- (sum (abs (data$R[data$R > mean(data$R)]))) /sum(abs(data$R)) # Area to the right of the mean in percent
+
+print(A)
+```
+
+As we can see (and calculate), the area sizes are very similar, meaning htat half of the probability mass is on each side of the mean. Notice that since we're in a simulation context, the areas are not *exactly* the same.
+
+### Useful Rules for Expected Values
+
 For any constants $a$ and $b$ and a random variable $X$, the following rules apply:
 
 - The expected value of a constant is the constant
@@ -96,81 +97,110 @@ $$ \mathbb{E}[aX+b] = a\mathbb{E}[X] + b$$
 $$ \mathbb{E}\left[ \sum_{i=1}^n a_iX_i \right] = \sum_{i=1}^n \mathbb{E}[a_iX_i] = \sum_{i=1}^n a_i \mathbb{E}[X_i] $$
 - For a variable $Y$ that is independent of $X$ it holds that:
 $$ \mathbb{E}[XY] = \mathbb{E}[X] \mathbb{E}[X] $$
+- The population mean is often denoted by $\mu$ or $\mu_X$ instead of $\mathbb{E}[X]$
 
-For example:
-$$ \begin{aligned} \mathbb{E}[2X_1 + 4X_2 - 5] &=\mathbb{E}[2X_1] + \mathbb{E}[4X_2] - \mathbb{E}[5]\\ 
-&= 2\mathbb{E}[X_1] + 4\mathbb{E}[X_2] +5 
-\end{aligned}$$
+## Variablity: Variance and Standard Deviation
 
-## A Measure of Variability: Variance and Standard Deviation
-Measures of variability measure the deviation (or distance) of a random variable from its expected value. The most popular is the variance, defined as the expected squared deviation of the variable from its expected value:
+The central tendendcy tells us, around which value the outcomes of the random variable cluster, but it is also important to get a measure on how far they *spread around the mean*. The variance and standard deviation are measures for this.
+
+You can see this notion of *distance from the mean* in the definition of the variance:
+
 $$ Var[X] = \mathbb{E} \left[ \left( X - \mathbb{E} [X] \right) ^2  \right] $$
-The deviation from the expected value $(X - \mathbb{E}[X])$ is squared in order to prevent perfect cancellation of deviations, since
+
+The deviation from the expected value $(X - \mathbb{E}[X])$ is squared in order to prevent perfect cancellation of deviations, since:
 $$\mathbb{E} \left[(X - \mathbb{E}[X]) \right] = \mathbb{E}[X] - \mathbb{E}[X] = 0$$
 
+### Useful Rules for Variances
 
-```{r echo=FALSE, fig.height=4, fig.width=4.5}
-mean = 0
-sd = 1
-data2 <- tibble(x = seq(mean - 3, mean + 3, by = 0.10),
-               y = dnorm(x, mean = mean, sd=sd))
-
-
-ggplot(data = data2, aes(x = x)) +
-  geom_line(aes(y = y), size = 2) + 
-  geom_vline(aes(xintercept = mean(x)) , color = "red", show.legend = F, size = 2)+
-  geom_vline(aes(xintercept = mean +1) , color = "darkblue", show.legend = F, size = 2) +
-  geom_vline(aes(xintercept = mean -1) , color = "darkblue", show.legend = F, size = 2) +
-  theme_minimal()
-``` 
-
-The variance is usually denoted by $\sigma^2$ or $\sigma^2_X$.
-
-### Rules for Calculating Variances
 For any constants $a$ and $b$ and a random variable $X$, the following rules apply:
 
-- Alternative representation (see Appendix 1 for proof)
+- Alternative representation
 $$ Var[X] = \mathbb{E} \left[ X^2 \right] - \mathbb{E}[X]^2 $$
 - Variance of a constant is zero:
 $$ Var[c] = 0 $$
 - Variance of a linear combination:
 $$ Var[aX+b] = a^2 Var[X] $$
+- The population variance is often denoted by $\sigma^2$ or $\sigma_X^2$ instead of $Var[X]$.
 
 ### The Standard Deviation
+If we change the unit of measurement of $X$ by $a = 1000$, e.g. from kilometers to meters, the variance increases linearly by $a^2 = 1000 * 1000$ (see rules above). Since this makes it difficult to compare the variability of different variables, we use the standard deviation, which is the positive part of the square root of the variance:
 
-The standard deviation is yimply defined as the square root of the variance:
-$$ sd[X] = \sqrt{Var[X]} $$
-We also denote it by $\sigma$ or $\sigma_X$.
+$$ sd[X] = + \sqrt{Var[X]} $$
+For any constants $a$ and $b$ and a random variable $X$, it has the following useful properties:
+- Standard deviation of a linear combination:
+$$ sd[a X + b] = |a| sd[X] $$
 
-## Standardising Random Variables
+- The standard deviation is often denoted by $\sigma$ or $\sigma_X$ instead of $sd[X]$.
+
+## Standardisation of Variables
 
 Using the properties of the expected value and variance, we can transform any variable to a standardised variable with mean 0 and standard deviation 1:
 $$ Z := \frac{X-\mu}{\sigma} $$
-Proof: write $Z = aX + b$ and define $a := 1/\sigma$ and $b := -(\mu/\sigma)$. Then:
-$$\begin{aligned}  \mathbb{E}[Z] &= a\mathbb{E}[X] + b = \frac{\mu}{\sigma} - \frac{\mu}{\sigma} = 0 \qquad\text{and} \\
-Var[Z] &= a^2 Var[X] = \frac{\sigma^2}{\sigma^2} = 1
-\end{aligned}$$
-This property is useful to compare different random variables and is utilised e.g. in t-tests.
 
-## Measures of Association: Covariance and Correlation
-The covariance and correlation describe how two random variables vary together, indicating a relationship between them. We begin by defining the covariance:
+We can demonstrate this with a short simulation. In the following we simulate a random variable $X$ from a normal distribution, that has mena $3$ and standard deviation $1.5$
 
-$$ Cov[X,Y] = \mathbb{E} \left[ (X - \mathbb{E}[X]) - (Y - \mathbb{E}{Y} ) \right] $$
-Notice that the covariance of a variable with itself is the variance of the variable:
-$$ \begin{aligned} Cov[X,X] &= \mathbb{E} \left[ (X - \mathbb{E}[X])  (X - \mathbb{E}{X} ) \right] \\
-&=  \mathbb{E} \left[ \left( X - \mathbb{E} [X] \right) ^2  \right]\\
-&= Var[X] 
-\end{aligned}$$
+```{r fig.height=4, fig.width=9}
+library(ggplot2)
+set.seed(1337) #seed for reproducibility
+data_st <- data.frame(R = rnorm(n = 10000, mean = 3, sd = 1.5))
 
-The covariance is usually denoted by $\sigma_{XY}$
+ggplot(data_st, aes(x = R)) +
+  geom_histogram(aes(y=..density..),bins = 100) + 
+  geom_vline(xintercept = mean(data_st$R), color="red") +
+  geom_vline(xintercept = 0, color="green") +
+  stat_function(fun = dnorm, color = "green", args = list(mean = 0, sd = 1))+
+  stat_function(fun = dnorm, color = "red", args = list(mean = 3, sd = 1.5)) +
+  xlim(c(-4,8)) +
+  theme_minimal()
+```
 
-### Rules for Calculating Covariances
+The green lines indicate a standard normal distribution with $\mu = 0$ and $\sigma = 1$. Our simulated varaible clearly deviates from it. If we now transform $X$ according to the formula above, the result yields:
+
+```{r warning=FALSE, fig.height=4, fig.width=9}
+data_st$Z <- (data_st$R - mean(data_st$R)) / sd(data_st$R)
+
+ggplot(data_st, aes(x = Z)) +
+  geom_histogram(aes(y=..density..),bins = 100) + 
+  geom_vline(xintercept = mean(data_st$R), color="red") +
+  geom_vline(xintercept = 0, color="green") +
+  stat_function(fun = dnorm, color = "green", args = list(mean = 0, sd = 1))+
+  stat_function(fun = dnorm, color = "red", args = list(mean = 3, sd = 1.5)) +
+  xlim(c(-4,8)) +
+  theme_minimal()
+```
+
+## Association: Covariance and Correlation
+
+The covariance captures the joint variation of two random variables. It allows us to get a sense of the relationship of them, e.g. $X$ is always high when $Y$ is. This can be visualised graphically:
+
+```{r fig.height=4, fig.width=9}
+library(ggplot2)
+set.seed(1337)
+data_cov <- data.frame(X = 1:1000 + rnorm(1000, sd = 100),
+                       Y = 1:1000 + rnorm(1000, sd = 100))
+
+ggplot(data_cov, aes(x = X, y = Y)) + 
+  geom_point() +
+  geom_point(aes(x = mean(X), y = mean(Y)), color ="red") + 
+  geom_vline(xintercept = mean(data_cov$X) + sd(data_cov$X), color = "red") +
+  geom_hline(yintercept = mean(data_cov$Y) + sd(data_cov$Y), color = "red")
+```
+
+We can easily see that $X$ and $Y$ have a strong relationship. We can stat that: when the deviation of $X$ (vertical line) from its mean (red dot) is high, the same can be said about the deviation of $Y$ (horizontal line).
+
+Expressing this relation of deviations from the mean mathematically yields us the formula of the covariance:
+
+$$ Cov[X,Y] = \mathbb{E} \left[ (X - \mathbb{E}[X]) (Y - \mathbb{E}{Y} ) \right] $$
+
+### Useful Rules for Covariances
+
+For any constants $a$ and $b$ and random variables $X$, and $Y$ the following rules apply:
 
 - Alternative representations:
 $$ \begin{aligned}
-Cov[X,Y] &= \mathbb{E}[XY] - \mathbb{E}[X] \mathbb{E}[Y] & \text{see Appendix 1.2 for proof} \\
+Cov[X,Y] &= \mathbb{E}[XY] - \mathbb{E}[X] \mathbb{E}[Y] \\
 &= \mathbb{E}[(X -\mathbb{E}[X])Y] \\
-&= \mathbb{E}[X (Y -\mathbb{E}[Y])] & \text{see Appendix 1.3 for proof} \\
+&= \mathbb{E}[X (Y -\mathbb{E}[Y])] \\
 \end{aligned}$$
 
 - Covariance given independence of $X$ and $Y$:
@@ -182,42 +212,15 @@ Cov[X,Y] &= \mathbb{E}[XY] - \mathbb{E}[X] \mathbb{E}[Y] \\
 - Variance of linear combinations:
 $$ Cov[a_1 X + b_1, a_2Y + b_2] =  a_1 a_2 Cov[X,Y]$$
 
-- The boundary of the covariance of two random variables (its most extreme value) is given by the product of their standard deviations. This is also called the *Cauchy-Schwartz inequality*:
+- The boundary of the covariance of two random variables (its most extreme value) is given by the product of their standard deviations. This is also called the *Cauchy-Schwartz Inequality*:
  $$ |Cov[X,Y]| \leq sd[X] sd[Y] $$
-
+ 
+ - The population covariance is usually denoted by $\sigma_{XY}$ instead of $Cov[X,Y]$
+ 
 ### The Correlation Coefficient
 
-The covariance captures the relationship between two random variables, but is dependent on their unit of measurement. However, it is clear that the strenght of the relationship is unrelated to the units of measurement. To capture this "pure" relationship, we use the correlation coefficent:
+The variance and standard deviation are both dependent on their units of measurement. To capture the *pure* relationsip betwee two random variables, we can get rid of this by using the *Cauchy-Schwartz Inequality* to normalise the variance. This yields us the correlation coefficient:
 
 $$  Corr[X,Y] = \frac{Cov[X,Y]}{sd[X] sd[Y]} = \frac{\sigma_{XY}}{\sigma_X \sigma_Y}$$
 
-# Appendix 1
-
-## Proof for the alternative representation of the Variance
-$$ \begin{aligned}  Var[X] &= \mathbb{E} \left[ \left( X - \mathbb{E} [X] \right) ^2  \right] \\
-&= \mathbb{E} \left[ X^2 - 2X\mathbb{E}[X] + \mathbb{E}[X]^2 \right] \\
-&= \mathbb{E} \left[ X^2 \right] - \mathbb{E} \left[ 2X\mathbb{E}[X] \right] + \mathbb{E}\left[ \mathbb{E}[X]^2 \right] \\
-&= \mathbb{E} \left[ X^2 \right] - 2 \mathbb{E}[X] \mathbb{E}[X] + \mathbb{E}[X]^2 \\
-&= \mathbb{E} \left[ X^2 \right] - 2 \mathbb{E}[X]^2 + \mathbb{E}[X]^2 \\
-&= \mathbb{E} \left[ X^2 \right] - \mathbb{E}[X]^2
-\end{aligned}$$
-
-## Proof for the alternative representation of the covariance
-$$ \begin{aligned}  Cov[X,Y] &= \mathbb{E} [ (X - \mu_X) (Y - \mu_Y) ] \\
-&= \mathbb{E} [ XY - X \mu_Y - Y \mu_X + \mu_X \mu_Y ] \\
-&= \mathbb{E} [ XY ] - \mathbb{E} [X \mu_Y] - \mathbb{E} [Y \mu_X] + \mathbb{E}[\mu_X \mu_Y] \\
-&= \mathbb{E} [ XY ] - \mu_Y \mathbb{E}[X]  - \mu_X \mathbb{E}[Y] + \mu_X \mu_Y \\
-&= \mathbb{E} [ XY ] - \mu_Y \mu_X - \mu_X \mu_Y + \mu_X \mu_Y \\
-&= \mathbb{E} [ XY ] - \mu_X \mu_Y
-\end{aligned}$$
-
-## Proof for the second alternative representation of the covariance
-$$ \begin{aligned}
-Cov[X,Y] &= \mathbb{E}[XY] -\mu_X \mu_Y \\
-&= \mathbb{E}[XY] - \mu_X\mathbb{E}[Y] \\
-&= \mathbb{E}[XY] - \mathbb{E}[\mu_XY] \\
-&= \mathbb{E}[ XY - \mu_X Y] \\
-&= \mathbb{E} [(X - \mu_X) Y]
-\end{aligned}
-$$
-The proof is analoguous for $\mathbb{E}[X (Y -\mathbb{E}[Y])]$
+- The population correlation coefficient is usually denoted as $\rho$ or $\rho_{XY}$ instead of $Corr[X,Y]$
