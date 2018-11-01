@@ -53,9 +53,11 @@ $$p_j = P(X = x_j), \; j = 1, 2 \qquad \text{with } p_1 + p_2 = 1$$
 
 # Features of Probability Distributions
 
+In this section we will cover the basic features of probability distributions, also called the *moments* of the distribution.
+
 ## Central Tendency: The Expected Value
 
-The most commonly used feature of a probability distribution is the *expected value*. It splits the probability under the *pdf* in half.
+The most commonly used feature of a probability distribution is the *expected value*, or the **first moment**. It splits the probability under the *pdf* in half.
 
 > The expected value is the value from a probability distribution, for which the probabilities of another value being greater or smaller than it are exactly equal.
 
@@ -101,7 +103,7 @@ $$ \mathbb{E}[XY] = \mathbb{E}[X] \mathbb{E}[X] $$
 
 ## Variablity: Variance and Standard Deviation
 
-The central tendendcy tells us, around which value the outcomes of the random variable cluster, but it is also important to get a measure on how far they *spread around the mean*. The variance and standard deviation are measures for this.
+The central tendendcy tells us, around which value the outcomes of the random variable cluster, but it is also important to get a measure on how far they *spread around the mean*. The variance and standard deviation are measures for this. The variance is also referred to as the **second moment**.
 
 You can see this notion of *distance from the mean* in the definition of the variance:
 
@@ -120,6 +122,11 @@ $$ Var[X] = \mathbb{E} \left[ X^2 \right] - \mathbb{E}[X]^2 $$
 $$ Var[c] = 0 $$
 - Variance of a linear combination:
 $$ Var[aX+b] = a^2 Var[X] $$
+
+- Variance of a sum of random variables, if they are i.i.d:
+
+$$ Var\left[ \sum_{i=1}^n a_iX_i \right] = \sum_{i=1}^n Var [a_iX_i] = \sum_{i=1}^n a_i^2 Var[X_i] $$
+
 - The population variance is often denoted by $\sigma^2$ or $\sigma_X^2$ instead of $Var[X]$.
 
 ### The Standard Deviation
@@ -223,7 +230,16 @@ The variance and standard deviation are both dependent on their units of measure
 
 $$  Corr[X,Y] = \frac{Cov[X,Y]}{sd[X] sd[Y]} = \frac{\sigma_{XY}}{\sigma_X \sigma_Y}$$
 
-- The population correlation coefficient is usually denoted as $\rho$ or $\rho_{XY}$ instead of $Corr[X,Y]$
+- The population correlation coefficient is usually denoted by *rho*: $\rho$ or $\rho_{XY}$ instead of $Corr[X,Y]$
+
+# Hypothesis Testing
+
+Using the properties of random variables and their distributions from above, we now can come to a very useful application: hypothesis testing.
+
+For example let us say that we are interested in the income of ZU Students, and know the following:
+
+- The income is distributed normally with mean $1000$ and standard deviation $200$
+
 
 # Simple Linear Regression and OLS
 Now that we have learned about correlation and testing, we want to predict one variable from another. One simple way to do so is using linear regression. Simple linear regression (SLR) is about predicting a dependent variable (*regressand*) from one independent variable (*regressor*). A SLR model is given by: $$y = \beta_0 + \beta_1x + \epsilon$$
