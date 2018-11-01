@@ -1,0 +1,157 @@
+---
+title: "Inference 2 - Hypothesis Tests"
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: no
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction
+
+This section covers a fundamental part of inference: hypothesis testing. Tests of hypotheses are frequently applied in econometrics, e.g. t-tests for OLS parameters or in tests for heteroscedasticity.
+
+We use hypothesis testing, because we don't much about our populations, just from a sample. E.g. we actually don't know:
+
+- The population mean
+- The population variance
+- The true distribution of the population
+
+If we now want to estimate some parameter of the population, e.g. its mean, we do the following:
+
+Assume that the distribution of the population is normal (e.g. because it is reasonably from theory)#
+
+1. Formulate a hypothesis about our population mean (e.g. $H_0:\mu_X = 1000$)
+2. Estimate the mean with the arithmetic mean $\bar{X}$
+3. Estimate the variance and derive the sample standard deviation $S_X$
+4. Standardise $\bar{X}$ using our estimated $S_X$ and the assumed $\mu_X$
+5. Calculate the probability that our observed $\bar{X}$ is from the population, given a specific level of certainty (e.g. $95 \%$)
+
+
+## Simulated Population
+
+We take again our sample from a simulated population of ZU student income:
+
+```{r fig.height=4, fig.width=9, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(tidyverse)
+set.seed(11) # seed for reproducibility
+
+n <- 1200
+inc_2 <- rnorm(n, mean = 1000, sd = 200)
+
+ggplot() +
+geom_histogram(aes(x = inc_2,
+y = ..density..),binwidth = 60,alpha = 0.8) +
+geom_density(aes(x = inc_2,
+y = ..density..),col = "red",size = 2,alpha = 0.8) +
+labs(title = "Income of ZU Students") +
+theme_minimal()
+
+```
+
+## Sample
+
+We draw a random sample with size `50` from our population:
+
+```{r}
+set.seed(24)
+sample_n <- 50
+sample_2 <- sample(x = inc_2, size = sample_n, replace = F)
+```
+
+
+
+```{r fig.height=4, fig.width=9}
+ggplot() +
+geom_histogram(aes(x = sample_2,
+y = ..density..),binwidth = 50,alpha = 0.8) +
+labs(title = "SAMPLE Histogram Income ZU Students",
+subtitle = paste0("red = SAMPLE mean:",mean(sample_2) %>% round(2)," with sd: ",sd(sample_2) %>% round(2))) +
+geom_vline(xintercept = mean(sample_2),color = "red",size = 2) +
+theme_minimal()
+```
+
+# Hypothesis Testing Procedure
+
+Given the assumption that our population is distributed normally we:
+
+1. Formulate the Null-Hypothesis that mean student income is less then $850 €$:
+$$ H_0 : \mu_X < 850  $$
+Which leaves us with the alternative Hypothesis that the mean income is more or equal to $850€$:
+$$ H_1: \mu_X \geq 850 $$
+
+2. Estimate the mean with the sample mean $\bar{X}$ :
+```{r}
+X_bar <- mean(sample_2)
+X_bar
+```
+
+3. Estimate the sampling variance $S^2$ and derive the sampling standard deviation $S$ :
+```{r}
+var(sample_2)
+```
+```{r}
+S <- sd(sample_2)
+S
+```
+
+At this state we would expect our sample mean to be distributed like this:
+
+```{r fig.height=4, fig.width=9}
+ggplot(data =  data.frame(X_bar = 850:1030), aes(x=X_bar)) +
+  stat_function(fun = dnorm, args = list(mean = 940, sd = 200/sqrt(sample_n)), size = 2) +
+  geom_vline(xintercept = mean(sample_2), color = "red", size = 1.5) +
+  geom_vline(xintercept = 940, color = "green", size = 1.5) +
+  labs(title = "PDF of our sample mean") +
+  theme_minimal()
+```
+
+
+4. Standardise $\bar{X}$ so we can easily calculate probabilities
+
+```{r}
+X_bar_std <- (X_bar - 500) / (S / sqrt(sample_n))
+X_bar_std
+```
+
+
+Based on this single sample, we would guess that the mean monthly income of ZU students is ca. $950 €$, with a standard deviation of roughly $200 €$. This is quite close to the true (population) mean. But how can we be sure that our estimated sample mean is not too far away from the population mean?
+
+To answer these questions, we make use of the **Central Limit Theorem**:
+
+> The mean from a random sample for *any* population, when standardised, has an asymptotic standard normal distribution.
+
+This means, if we could obtain an estimate of the variance (or standard deviation) of our sample mean, and assume a given population mean, we can make a statement of how likely it is to observe our given sample mean.
+
+Let's break this down.
+
+### Hypothesis Test for a Standard Normal Variable
+
+Lets take it as given that a variable follows the standard normal distribution. Since we know the pdf of the standard normal distribution, we can calculate the probability of the variable realising any particular value.
+
+We can also do this graphically:
+
+```{r fig.height=4, fig.width=9}
+ggplot(data =  data.frame(X = -4:4), aes(x=X)) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1), size = 2) +
+  geom_vline(xintercept = 2, color = "red") +
+  labs(title = "PDF of a standard normal random variable") +
+  stat_function(fun = dnorm, xlim = c(2,4), geom = "area", fill = "red")+
+  theme_minimal()
+```
+
+The pdf tells us the probability of a particual observation, or, alternatively, the probability of observing values greater than a particular observation.
+
+E.g., the probability of observing values of $X$ greater than $2$ is 
+```{r}
+dnorm(2)
+```
+which corresponds to the red area under the curve.
