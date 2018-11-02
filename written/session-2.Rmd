@@ -35,7 +35,7 @@ If we would additionally conduct another experiment where we count two successiv
 
 - Use **capital letters** such as $O$ or $P$ to denote a **random variable**
 - Use **small letters** such as $m$ or $n$ to denote **particual outcomes** of $M$ and $N$
-- Use **subscripts** (e.g. $a_i$) to distinct **different instances** of the same random variable
+- Use **subscripts** (e.g. $a_i$) to distinct **different outcomes** of the same random variable $A_i$
 <span style="color:red">\\ben: $a_i$ kann auch benutzt werden, um outcomes verschiedener variablen $A_i$ zu denoten (s. wooldridge)</span>
 
 ## Discrete random variables
