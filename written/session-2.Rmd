@@ -62,7 +62,7 @@ We call a random variable continuous if it takes on any real value with a probab
 
 ## Discrete random variables
 For discrete random variables, the probability density function (pdf), or rather, the probability mass function (pmf) summarises the information concerning the possible outcomes of a discrete random variable $X$ and its corresponding probabilities. It is defined as: $$f_X(x) = P(X=x)$$ For our card symbol example, a pmf would look like this:
-```{r}
+```{r warning=FALSE, fig.height=4, fig.width=9}
 library(ggplot2)
 
 p <- rep(0.25,4)
@@ -80,7 +80,7 @@ ggplot(df, aes(symbols,p, fill=symbols)) +
 
 With this pmf, we can now simply calculate the probability of any event involving that variable. For instance, we could ask ourselves: "What is the probability that the symbol of the card that I will draw is either Hearts or Clubs?". The pmf tells us: $$\begin{aligned}&P(X=\text{Hearts or } X=\text{Clubs})\\&=P(X=\text{Hearts}) + P(X=\text{Clubs})\\&=0.25 + 0.25 = 0.5\end{aligned}$$  
 We could also answer that question with the help of the cumulative density function (cdf). As the name already suggests, the cdf cumulates the probabilities of the single possible outcomes and is defined as $$F(x) = \sum_{X\leq x}f_X(x)=P(X\leq x)$$ Our current example with the cards does not really suit the benefits of a cdf, as we could indeed read from the function the probability of drawing either a Hearts card or a Spades card, but we are unable to read from it the probability of drawing either a Diamonds card or a Hearts card:
-```{r}
+```{r warning=FALSE, fig.height=4, fig.width=9}
 df$xend <- c(df$symbols[2:nrow(df)], 5)
 df$yend <- cumsum(df$p)
 ggplot(df, aes(as.numeric(symbols), cumsum(p), xend=xend, yend=yend, color=symbols)) +
@@ -94,7 +94,7 @@ ggplot(df, aes(as.numeric(symbols), cumsum(p), xend=xend, yend=yend, color=symbo
       scale_x_continuous(breaks = 1:5, 
                          labels = c("Hearts", "Spades",
                                     "Clubs", "Diamonds", "")) +
-      guides(color=F) +
+      guides(color=F) + labs(x="Symbols", y="Probability") +
       theme_minimal()
 
 ```
@@ -104,7 +104,7 @@ ggplot(df, aes(as.numeric(symbols), cumsum(p), xend=xend, yend=yend, color=symbo
 Because it makes little sense to think about the probability that a continuous random variable assumes a certain value, the pdf of continuous random variables is used to calculate events concerning a range of values. This is done by taking the integral of this range. Generally: $$F_X(x) = \int f_X(x) dx$$
 
 In our height example, we could be interested in the probability that a person is somewhere between $170cm$ and $180cm$ tall, i.e. in $P(170\leq X \leq 180)$.
-```{r}
+```{r warning=FALSE, fig.height=4, fig.width=9}
 height = rnorm(10000, mean=177, sd=30)
 df = data.frame(height)
 dp <- ggplot(df, aes(height)) + geom_density(size=1) + 
@@ -120,7 +120,8 @@ dp + geom_area(data=data.frame(x=dpb$data[[1]]$x[x1:x2],
     theme(axis.title.y=element_blank(),
           axis.text.y=element_blank()) + labs(x="Height")
 ```
-```{r}
+
+```{r warning=FALSE, message=FALSE}
 library(sfsmisc)
 dens = density(df$height)
 integrate.xy(dens$x, dens$y,170,180)
@@ -129,7 +130,7 @@ Thus, $P(170\leq X \leq 180) \approx 0.13 = 13%$ (the integrate.xy function is n
 
 While we can calculate probabilities under the pdf for a given Range $P(a \leq X \leq b)$, the cumulative density function always provides us with the probability of the variable to take on a value *up to* $x$, that is, $P(X \leq x)$. Its definition is: $$F_X(x)=\int_{-\infty}^xf_X(x)dx$$ At all points its value is the total area under the curve of the pdf up to $x$.
 
-```{r}
+```{r warning=FALSE, fig.height=4, fig.width=9}
 df_int = data.frame(height=dens$x, y=cumsum(dens$y)/2)
 ggplot(df_int, aes(height,y)) + geom_line(size=1) + 
   geom_vline(aes(xintercept=mean(height)), color="red", linetype="dashed",
@@ -141,6 +142,48 @@ ggplot(df_int, aes(height,y)) + geom_line(size=1) +
 From this graph we can now easily read the probability that a person is $150cm$ tall or smaller (ca. $20%$). For the requirements and attributes of probability density functions and cumulative density functions, please refer to the course slides.
 
 # Joint Distributions and Conditional Distributions
+We often have to deail with more than just one variable in applied econometrics. For example, we could be interest in the probability that a person is between $170cm$ and $180cm$ tall *and* weighs between $60kg$ and $90kg$ (this is important for shoe manufacturers). We could also be interested in the probability of getting a $6$ with one throw of a die given the die is red instead of blue (comes in handy at the casino).
+
+## Joint Distributions
+
+### The discrete case
+Let $X$ be a random variable for the throw of a die with equal chances to every side, and $Y$ a random variable for the color (blue, red) of the die. Throwing a random die would lead us to the joint probability density function of $(X,Y)$: $$f_{X,Y}(x,y) = P(X=x, Y=y)$$.
+
+It is quite easy to obtain the joint pdf of $X$ and $Y$ if they are independent. $X$ and $Y$ are independent if: $$f_{X,Y}(x,y) = f_X(x)f_Y(y)$$ In other words, they are independent if the die side thrown does not depend on the color of the die. In the discrete case, it is the same as $$P(X=x, Y=y) = P(X=x)P(Y=y)\text{,}$$ that is, the probability that the die is read and you throw a 6 is the product of the probability of throwing a 6 and of the die being red. Since we know these probabilities, we can calculate: $\frac{1}{6} \times \frac{1}{2} = \frac{1}{12}$.
+
+### The continuous case
+By taking the integral of a joint pdf of continous variables, we can get the probability that X and Y fall in a certain interval: $$P(a \leq X \leq b, c \leq Y \leq d) = \int_a^b \int_c^df_{X,Y}(x,y)dydx$$
+If you have any given functions, it is quite easy (as with the normal distribution) and can be done by hand (might in some cases be easier than doing it with r). A continuous joint pdf could look like this ($X$ = height, $Y$ = weight; this is a bad example because obviously weight is dependent from height).
+```{r warning=FALSE, message=FALSE, fig.height=4, fig.width=9}
+library(MASS)
+library(threejs)
+# Lets assume different standard deviations for height
+# so that we are only looking at grown men and women
+mu = c(177, 70); names(mu) = c("X", "Y")
+stdevs = c(4, 5); names(stdevs) = names(mu)
+cormatrix = matrix(c(1,0.9,0.9,1), ncol=2)
+b = stdevs %*% t(stdevs)
+varcovmat = b*cormatrix
+colnames(varcovmat) = rownames(varcovmat) = names(mu)
+obs = mvrnorm(n=10000, mu=mu, Sigma=varcovmat, empirical=T)
+obs.kde = kde2d(obs[,1], obs[,2], n=100)
+
+x = obs.kde$x; y = obs.kde$y; z = obs.kde$z
+xx = rep(x, times=length(y))
+yy = rep(y, each=length(x))
+zz = z; dim(zz) = NULL
+ra = ceiling(16*zz/max(zz))
+col = rainbow(16, 2/3)
+scatterplot3js(x=xx, y=yy, z=zz, size=0.4, color=col[ra], bg="white")
+```
+
+## Conditional Distributions
+When we are interested in the probability of a specific outcome given we observed another specific outcome, we might want to take a look at the conditional distribution of $Y$ given $X$, or rather, at the **conditional probability density function**: $$\frac{f_{Y|X}(y|x)}{f_X(x)}$$
+For the discrete case follows: $$f_{X|Y}(y|x) = P(Y=y|X=x)$$
+When $X$ and $Y$ are independent, it follows from $f_{X,Y}(x,y) = f_X(x)f_Y(y)$ that $$f_{X|Y}(y|x) = f_Y(y)$$
+
+$f_{X,Y}(x,y) = f_X(x)f_Y(y)$
+
 
 # Features of Probability Distributions
 
