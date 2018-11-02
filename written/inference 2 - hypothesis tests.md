@@ -1,5 +1,5 @@
 ---
-title: "Probability and Statistics Fundamentals (Session 2)"
+title: "Inference 1 - Hypothesis Tests"
 output:
   html_document:
     number_sections: yes
@@ -9,9 +9,8 @@ output:
     toc: yes
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
+
 
 # Introduction
 
@@ -21,10 +20,12 @@ Since we're interested in practical application, we will introduce this topic wi
 
 Our gratitude goes to Marcel Schliebs for providing this simulation example.
 
+
 # Simulation
 
 We begin by loading the required packages. For ease of programming we use the `tidyverse` package, a comprehensive toolset for data analysis.
-```{r message=FALSE, warning=FALSE}
+
+```r
 library(tidyverse)
 library(ggplot2)
 ```
@@ -32,23 +33,25 @@ library(ggplot2)
 ## Our Simulated Population
 First we simulate a population that represents the monthly income of ZU Students. Consider the data we now simulate as our **population**. Of course, in reality we don't know the distribution monthly income of ZU students.
 
-```{r fig.height=4, fig.width=9}
+
+```r
 set.seed(11) # seed for reproducibility
 
 n <- 1200
-inc <- fGarch::rsnorm(n, mean = 1000, sd = 200, xi = 2.0)
+inc_2 <- fGarch::rsnorm(n, mean = 1000, sd = 200, xi = 2.0)
 
 ggplot() +
-geom_histogram(aes(x = inc,
+geom_histogram(aes(x = inc_2,
 y = ..density..),binwidth = 50,alpha = 0.8) +
-geom_density(aes(x = inc,
+geom_density(aes(x = inc_2,
 y = ..density..),col = "red",size = 2,alpha = 0.8) +
 labs(title = "Income of ZU Students",
 subtitle = "green = POPULATION mean") +
-geom_vline(xintercept = mean(inc),color = "green",size = 2) +
+geom_vline(xintercept = mean(inc_2),color = "green",size = 2) +
 theme_minimal()
-
 ```
+
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
 
 Notice how our population is **not normally distributed**. In econometrics, normality is often an assumption that is required for conducting inference. E.g. it is assumed that our OLS-residuals are normally distributed.
 
@@ -60,22 +63,32 @@ Usually we work with samples of our population of interest, hoping that the anal
 
 First we demonstrate how a single sample is simulated and what clues about the population it can give us:
 
-```{r}
+
+```r
 set.seed(1337)
-sample_1 <- sample(x = inc, size = 50, replace = F)
+sample_2 <- sample(x = inc, size = 50, replace = F)
+```
+
+```
+## Error in sample(x = inc, size = 50, replace = F): object 'inc' not found
 ```
 
 
 
-```{r fig.height=4, fig.width=9}
+
+```r
 ggplot() +
-geom_histogram(aes(x = sample_1,
+geom_histogram(aes(x = sample_2,
 y = ..density..),binwidth = 50,alpha = 0.8) +
 labs(title = "SAMPLE Histogram Income ZU Students",
-subtitle = paste0("green = population mean, ",  "red = SAMPLE mean:",mean(sample_1) %>% round(2)," with sd: ",sd(sample_1) %>% round(2))) +
-geom_vline(xintercept = mean(sample_1),color = "red",size = 2) +
+subtitle = paste0("green = population mean, ",  "red = SAMPLE mean:",mean(sample_2) %>% round(2)," with sd: ",sd(sample_2) %>% round(2))) +
+geom_vline(xintercept = mean(sample_2),color = "red",size = 2) +
   geom_vline(xintercept = mean(inc),color = "green",size = 2)+
 theme_minimal()
+```
+
+```
+## Error in mean(sample_2): object 'sample_2' not found
 ```
 
 Based on this single sample, we would guess that the mean monthly income of ZU students is ca. $950 €$, with a standard deviation of roughly $200 €$. This is quite close to the true (population) mean. But how can we be sure that our estimated sample mean is not too far away from the population mean?
@@ -94,7 +107,8 @@ Lets take it as given that a variable follows the standard normal distribution. 
 
 We can also do this graphically:
 
-```{r fig.height=4, fig.width=9}
+
+```r
 ggplot(data =  data.frame(X = -4:4), aes(x=X)) +
   stat_function(fun = dnorm, args = list(mean = 0, sd = 1), size = 2) +
   geom_vline(xintercept = 2, color = "red") +
@@ -103,10 +117,17 @@ ggplot(data =  data.frame(X = -4:4), aes(x=X)) +
   theme_minimal()
 ```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+
 The pdf tells us the probability of a particual observation, or, alternatively, the probability of observing values greater than a particular observation.
 
 E.g., the probability of observing values of $X$ greater than $2$ is 
-```{r}
+
+```r
 dnorm(2)
+```
+
+```
+## [1] 0.05399097
 ```
 which corresponds to the red area under the curve.
