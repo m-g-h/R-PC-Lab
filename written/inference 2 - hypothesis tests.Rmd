@@ -130,6 +130,8 @@ Z_inc_bar <- (inc_bar - 940) / (S_inc / sqrt(sample_n))
 Z_inc_bar
 ```
 
+Our standardised income is also called the *test statistic*.
+
 ```{r fig.height=4, fig.width=9}
 ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   stat_function(fun = dnorm, args = list(mean = 0, sd = 1), size = 2) +
@@ -139,10 +141,14 @@ ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   theme_minimal()
 ```
 
-**5. Calculate probability of $\bar{X}$ occuring at 5% significance level:**
+**5. Calculate probability of $\bar{X}$ occuring at 10% significance level:**
 
-Look up $z-value$ for $1-5\% = 95\%$, e.g. in this [table]{http://www.z-table.com/}.
+Look up the critical $z-value$ for $1-10\% = 90\%$, e.g. in this [table](http://www.z-table.com/).
 $$ z_{1-\alpha} = 1.65 $$
+
+If we now compare our test statistic against the critical value, we can see that it is greater:
+
+$$ 1.65 < 2.14 $$
 
 ```{r fig.height=4, fig.width=9}
 ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
@@ -154,3 +160,44 @@ ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   labs(title = "Assumed PDF of our standardised sample mean under H0") +
   theme_minimal()
 ```
+
+We now can make the following statements:
+
+- If the $H_0$ is true, samples with a $Z_{inc}$ in the dark grey area only occur $10\%$ of the time
+- In conclusion, we have some evidence against the our initial assumption that mean student income is at most $940 €$
+- This means that we can be optimistic that our sample is not one of th e$10 \%$ of outliers in the world of $H_0$, but that the $H_0$ is wrong
+
+Generally we can make the statement: "we can reject the null hypothesis that mean ZU student income is less than $940€$ at a significance level of $10\%$"
+
+## P-Values
+
+So called *p-values* are often used and reported in statistical work. They indicate the highest level of significance at which we can reject the $H_0$.
+
+In our example, we could not only reject the $H_0$ at the $10\%$ level, but also at the $5\%$ level:
+
+```{r fig.height=4, fig.width=9}
+ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1), size = 2) +
+    stat_function(fun = dnorm, xlim = c(-4,1.65), geom = "area", fill = "grey", alpha=0.5) +
+  stat_function(fun = dnorm, xlim = c(1.65,1.96), geom = "area", fill = "darkgrey", alpha=0.5) +
+  stat_function(fun = dnorm, xlim = c(1.96,4), geom = "area", fill = "black", alpha=0.5) +
+  geom_vline(xintercept = Z_inc_bar, color = "red", size = 1.5) +
+  geom_vline(xintercept = 0, color = "green", size = 1.5) +
+  labs(title = "Assumed PDF of our standardised sample mean under H0") +
+  theme_minimal()
+```
+
+But at most, we could reject it at the level of our test-statistic. So we just need to look up the corresponding value for $Z_\bar{inc}$ in the [z- table](http://www.z-table.com/) or with r:
+
+```{r}
+1- pnorm(Z_inc_bar)
+```
+
+This is our p-value. It tells us that we can reject the $H_0$ at most at a significance level of $\approx 1.6 \%$.
+
+# T-Test Function in R
+
+```{r}
+t.test(sample_2, mu = 940, alternative = "greater")
+```
+

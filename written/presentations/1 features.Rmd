@@ -8,13 +8,29 @@ output:
     theme: metropolis
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE }
 knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(fig.height=4)
+knitr::opts_chunk$set(fig.width=10)
 ```
+
+## Contents and Goals
+
+- Get to know the basic features of probability distributions
+    - Mean / Expected Value
+    - Variance and Standard Deviation
+    - Covariance and Correlation
+    - Standardisation
+- Learn how they work
+- Learn how we can manipulate them
+
+These features are the **building blocks of statistics**. Understanding how they work helps us to understand theoretical proofs.
+
+They are useful to understand the concepts of (not exclusively) **Estimation**, **Hypothesis Tests** and **Regression**
 
 ## Central Tendency: The Expected Value
 
-The most commonly used feature of a probability distribution is the *expected value*. It splits the probability under the *pdf* in half. It is calculated as a weighted average of the random variable:
+The most commonly used feature of a probability distribution is the *expected value*. It is calculated as a weighted average of the random variable.
 
 $$ \mathbb{E}[X] = \sum x_i f(x_i) $$
 
@@ -28,7 +44,7 @@ set.seed(1337) #seed for reproducibility
 data <- data.frame(R = rnorm(n = 1000000))
 ```
 
-```{r fig.height=4, fig.width=8}
+```{r}
 library(ggplot2)
 ggplot(data, aes(x = R)) +
   geom_histogram(aes(y = ..density..), bins = 200) + 
@@ -38,7 +54,7 @@ ggplot(data, aes(x = R)) +
 
 ---
 
-It looks like the area to the left of the mean is the same size at the area on the right side. Let's check that:
+- It looks like the area to the left of the mean is the same size at the area on the right side. Let's check that:
 
 ```{r echo=TRUE}
 A <- numeric() # Variable for storing the area sizes
@@ -49,7 +65,7 @@ A[2] <- (sum (abs (data$R[data$R > mean(data$R)]))) /sum(abs(data$R)) # Right ar
 print(A)
 ```
 
-As we can see (and calculate), the area sizes are very similar, meaning that half of the probability mass is on each side of the mean. Notice that since we're in a simulation context, the areas are not *exactly* the same.
+-  Notice that since we're in a simulation context, the areas are not *exactly* the same.
 
 
 ## Useful Rules for Expected Values
@@ -73,7 +89,40 @@ $$ \mathbb{E}[XY] = \mathbb{E}[X] \mathbb{E}[X] $$
 
 ## Variablity: Variance and Standard Deviation
 
-The central tendendcy tells us, around which value the outcomes of the random variable cluster, but it is also important to get a measure on how far they *spread around the mean*. The variance and standard deviation are measures for this.
+```{r}
+set.seed(1337) #seed for reproducibility
+data <- data.frame(R = rnorm(n = 1000000, sd=1.5))
+```
+
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+ggplot(data, aes(x = R)) +
+  geom_histogram(aes(y = ..density..), bins = 200) +
+    xlim(c(-6,6)) +
+    ylim(c(0,0.45)) +
+    geom_vline(xintercept = mean(data$R), color="red") +
+  theme_minimal()
+```
+
+## Variablity: Variance and Standard Deviation
+```{r}
+set.seed(1337) #seed for reproducibility
+data <- data.frame(R = rnorm(n = 1000000, sd=1))
+```
+
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+ggplot(data, aes(x = R)) +
+  geom_histogram(aes(y = ..density..), bins = 200) + 
+      xlim(c(-6,6)) +
+  ylim(c(0,0.45)) +
+  geom_vline(xintercept = mean(data$R), color="red") +
+  theme_minimal()
+```
+
+## Variablity: Variance and Standard Deviation
+
+- The variance measures how far a variable *spreads around the mean*
 
 You can see this notion of *distance from the mean* in the definition of the variance:
 
@@ -92,10 +141,18 @@ $$ Var[X] = \mathbb{E} \left[ X^2 \right] - \mathbb{E}[X]^2 $$
 $$ Var[c] = 0 $$
 - Variance of a linear combination:
 $$ Var[aX+b] = a^2 Var[X] $$
+
+## Useful Rules for Variances
+
+- The variance of a sum of random variables is the sum of the evariance, given independence:
+$$ Var\left[ a_i \sum_{i=1}^n X_i \right] = \sum_{i=1}^n Var[a_i X_i] = \sum_{i=1}^n a_i^2 Var[X_i] $$
+
 - The population variance is often denoted by $\sigma^2$ or $\sigma_X^2$ instead of $Var[X]$.
 
 ## The Standard Deviation
-If we change the unit of measurement of $X$ by $a = 1000$, e.g. from kilometers to meters, the variance increases linearly by $a^2 = 1000 * 1000$ (see rules above). Since this makes it difficult to compare the variability of different variables, we use the standard deviation, which is the positive part of the square root of the variance:
+
+- If we change the unit of measurement of $X$ by $a = 1000$, the variance scales quadratically by $a^2 = 1000 * 1000$
+- To avoid this, we calculate the standard deviation, which scales linearly with $a$:
 
 $$ sd[X] = + \sqrt{Var[X]} $$
 For any constants $a$ and $b$ and a random variable $X$, it has the following useful properties:
@@ -109,15 +166,19 @@ $$ sd[a X + b] = |a| sd[X] $$
 Using the properties of the expected value and variance, we can transform any variable to a standardised variable with mean 0 and standard deviation 1:
 $$ Z := \frac{X-\mu}{\sigma} $$
 
----
+## Standardisation of Variables: Example
 
-We can demonstrate this with a short simulation. In the following we simulate a random variable $X$ from a normal distribution, that has mena $3$ and standard deviation $1.5$
+We can demonstrate this with a short simulation. In the following we simulate a random variable $X$ from a normal distribution, that has mean $3$ and standard deviation $1.5$
 
-```{r echo=FALSE, fig.height=4, fig.width=9, message=FALSE, warning=FALSE}
-library(ggplot2)
+```{r echo=TRUE, message=FALSE, warning=FALSE}
 set.seed(1337) #seed for reproducibility
 data_st <- data.frame(R = rnorm(n = 10000, mean = 3, sd = 1.5))
+```
 
+## Standardisation of Variables: Example
+
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
 ggplot(data_st, aes(x = R)) +
   geom_histogram(aes(y=..density..),bins = 100) + 
   geom_vline(xintercept = mean(data_st$R), color="red") +
@@ -128,11 +189,22 @@ ggplot(data_st, aes(x = R)) +
   theme_minimal()
 ```
 
-The green lines indicate a standard normal distribution with $\mu = 0$ and $\sigma = 1$. Our simulated varaible clearly deviates from it. 
+## Standardisation: Subtracting the mean
 
----
+```{r echo=FALSE, fig.height=4, fig.width=10, warning=FALSE}
+data_st$Z <- (data_st$R - mean(data_st$R))
 
-If we now transform $X$ according to the formula above, the result yields:
+ggplot(data_st, aes(x = Z)) +
+  geom_histogram(aes(y=..density..),bins = 100) + 
+  geom_vline(xintercept = mean(data_st$R), color="red") +
+  geom_vline(xintercept = 0, color="green") +
+  stat_function(fun = dnorm, color = "green", args = list(mean = 0, sd = 1))+
+  stat_function(fun = dnorm, color = "red", args = list(mean = 3, sd = 1.5)) +
+  xlim(c(-4,8)) +
+  theme_minimal()
+```
+
+## Dividing by the standard deviation
 
 ```{r echo=FALSE, fig.height=4, fig.width=10, warning=FALSE}
 data_st$Z <- (data_st$R - mean(data_st$R)) / sd(data_st$R)
@@ -164,11 +236,11 @@ ggplot(data_cov, aes(x = X, y = Y)) +
   geom_hline(yintercept = mean(data_cov$Y) + sd(data_cov$Y), color = "red")
 ```
 
----
+## Association: Covariance and Correlation
 
-We can easily see that $X$ and $Y$ have a strong relationship. We can stat that: when the deviation of $X$ (vertical line) from its mean (red dot) is high, the same can be said about the deviation of $Y$ (horizontal line).
+- Deviation of $X$ (vertical line) from its mean (red dot) is highwhen the deviation of $Y$ (horizontal line) is high
 
-Expressing this relation of deviations from the mean mathematically yields us the formula of the covariance:
+ - Expressing this relation of deviations from the mean mathematically yields us the formula of the covariance:
 
 $$ Cov[X,Y] = \mathbb{E} \left[ (X - \mathbb{E}[X]) (Y - \mathbb{E}{Y} ) \right] $$
 
@@ -189,7 +261,7 @@ Cov[X,Y] &= \mathbb{E}[XY] - \mathbb{E}[X] \mathbb{E}[Y] \\
 &= 0 & \text{since } \mathbb{E}[XY] = \mathbb{E}[X] \mathbb{E}[X] 
 \end{aligned}$$
 
----
+## Useful Rules for Covariances
 
 - Variance of linear combinations:
 $$ Cov[a_1 X + b_1, a_2Y + b_2] =  a_1 a_2 Cov[X,Y]$$
@@ -201,7 +273,8 @@ $$ Cov[a_1 X + b_1, a_2Y + b_2] =  a_1 a_2 Cov[X,Y]$$
  
 ## The Correlation Coefficient
 
-The variance and standard deviation are both dependent on their units of measurement. To capture the *pure* relationsip betwee two random variables, we can get rid of this by using the *Cauchy-Schwartz Inequality* to normalise the variance. This yields us the correlation coefficient:
+- Variance and standard deviation are both dependent on their units of measurement.
+- Using the *Cauchy-Schwartz Inequality* we can normalise the variance:
 
 $$  Corr[X,Y] = \frac{Cov[X,Y]}{sd[X] sd[Y]} = \frac{\sigma_{XY}}{\sigma_X \sigma_Y}$$
 
