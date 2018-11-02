@@ -1,20 +1,20 @@
 ---
-title: "Inference 2 - Hypothesis Tests"
+title: "Inference 2 - Hypothesis Testing"
 output:
-  html_document:
-    number_sections: yes
-    toc: yes
-    toc_float: no
-  pdf_document:
-    toc: yes
+  ioslides_presentation:
+    widescreen: yes
+  slidy_presentation: default
+  beamer_presentation:
+    theme: metropolis
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE }
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(fig.height=4)
+knitr::opts_chunk$set(fig.width=10)
 ```
 
-
-# Introduction
+## Introduction
 
 This section covers a fundamental part of inference: hypothesis testing. Tests of hypotheses are frequently applied in econometrics, e.g. t-tests for OLS parameters or in tests for heteroscedasticity.
 
@@ -26,13 +26,17 @@ We use hypothesis testing, because we don't much about our populations, just fro
 - The population variance $\sigma^2_X$ and standard deviation $\sigma_X$
 - The true distribution of the population $X \sim ?(?)$
 
+## Introduction
+
 In this scenario (which is the realistic scenario) we do the following:
 
 **Assume the population distribution and a value for our parameter of interest. Then estimate the unknown parameters from a sample and test if our assumptions are reasonable.**
 
 This procedure is called hypothesis testing
 
-Assume that the distribution of the population is normal (e.g. because it is reasonably from theory)#
+## Formal Hypothesis Testing Procedure
+
+Assume that the distribution of the population is normal (e.g. because it is reasonably from theory)
 
 1. Formulate a hypothesis about our population mean (e.g. $H_0:\mu_X = 1000$)
 2. Estimate the mean with the arithmetic mean $\bar{X}$
@@ -40,19 +44,22 @@ Assume that the distribution of the population is normal (e.g. because it is rea
 4. Standardise $\bar{X}$ using our estimated $S_X$ and the assumed $\mu_X$
 5. Calculate the probability that our observed $\bar{X}$ is from the population, given a specific level of certainty (e.g. $95 \%$)
 
-
 ## Simulated Population
 
 We take again our sample from a simulated population of ZU student income:
 
-```{r fig.height=4, fig.width=9, message=FALSE, warning=FALSE}
+```{r echo=TRUE, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(tidyverse)
 set.seed(11) # seed for reproducibility
 
 n <- 1200
 inc_2 <- rnorm(n, mean = 1000, sd = 200)
+```
 
+## Simulated Population
+
+```{r}
 ggplot() +
 geom_histogram(aes(x = inc_2,
 y = ..density..),binwidth = 60,alpha = 0.8) +
@@ -67,12 +74,10 @@ theme_minimal()
 
 We draw a random sample with size `50` from our population:
 
-```{r}
-set.seed(24)
-sample_n <- 50
+```{r echo=TRUE}
+set.seed(24) ;   sample_n <- 50
 sample_2 <- sample(x = inc_2, size = sample_n, replace = F)
 ```
-
 
 
 ```{r fig.height=4, fig.width=9}
@@ -83,33 +88,33 @@ labs(title = "SAMPLE Histogram Income ZU Students") +
 theme_minimal()
 ```
 
-# Hypothesis Testing Procedure
 
-Given the assumption that our population is distributed normally we:
 
-**1. Formulate the Null-Hypothesis that mean student income is less then $940 €$:**
+## 1. Formulate the Null-Hypothesis that mean student income is less then $940 €$:
 $$ H_0 : \mu_{inc} < 940  $$
 Which leaves us with the alternative Hypothesis that the mean income is more or equal to $940€$:
 $$ H_1: \mu_{inc} \geq 940 $$
-```{r}
+```{r echo=TRUE}
 mu_inc = 940
 mu_inc
 ```
 
-**2. Estimate the mean with the sample mean $\bar{X}$ :**
-```{r}
+## 2. Estimate the mean with the sample mean $\bar{X}$ :
+```{r echo=TRUE}
 inc_bar <- mean(sample_2)
 inc_bar
 ```
 
-**3. Estimate the sampling variance $S^2$ and derive the sampling standard** deviation $S$ :
-```{r}
+##3. Estimate the sampling variance $S^2$ and derive the sampling standard deviation $S$ :
+```{r echo=TRUE}
 var(sample_2)
 ```
-```{r}
+```{r echo=TRUE}
 S_inc <- sd(sample_2)
 S_inc
 ```
+
+## Estimated Distribution
 
 At this state we would expect our sample mean to be distributed like this:
 
@@ -122,10 +127,9 @@ ggplot(data =  data.frame(X_bar = 850:1030), aes(x=X_bar)) +
   theme_minimal()
 ```
 
+## 4. Standardise $\bar{X}$ so we can easily calculate probabilities
 
-**4. Standardise $\bar{X}$ so we can easily calculate probabilities**
-
-```{r}
+```{r echo=TRUE}
 Z_inc_bar <- (inc_bar - 940) / (S_inc / sqrt(sample_n))
 Z_inc_bar
 ```
@@ -139,7 +143,7 @@ ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   theme_minimal()
 ```
 
-**5. Calculate probability of $\bar{X}$ occuring at 5% significance level:**
+##5. Calculate probability of $\bar{X}$ occuring at 5% significance level
 
 Look up $z-value$ for $1-5\% = 95\%$, e.g. in this [table]{http://www.z-table.com/}.
 $$ z_{1-\alpha} = 1.65 $$
