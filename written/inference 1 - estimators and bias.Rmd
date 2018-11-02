@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Estimators and Bias
 
-Using our knowledge of random variables and their properties, we are now able to conudct some basic inference. This means that we can utilise the *information from a random sample* of i.i.d. variables to learn something about the *population* of these variables.
+Using our knowledge of random variables and their properties, we are now able to conduct some basic inference. This means that we can utilise the *information from a random sample* of i.i.d. variables to learn something about the *population* of these variables.
 
 ## Simulated Population
 
@@ -27,18 +27,17 @@ set.seed(11) # seed for reproducibility
 
 n <- 1200
 inc <- rnorm(n, mean = 1000, sd = 200)
+```
 
+```{r fig.height=4, fig.width=9}
 ggplot() +
-geom_histogram(aes(x = inc,
-y = ..density..),binwidth = 60,alpha = 0.8) +
-geom_density(aes(x = inc,
-y = ..density..),col = "#99CC00",size = 2) +
-labs(title = "Population of Income of ZU Students") +
-geom_vline(xintercept = mean(inc),color = "#00CC33",size = 2) +
-geom_vline(xintercept = mean(inc) + 200,color = "#009900",size = 2) +
-geom_vline(xintercept = mean(inc) - 200,color = "#009900",size = 2) +
-theme_minimal()
-
+  geom_histogram(aes(x = inc, y = ..density..),binwidth = 60,alpha = 0.8) +
+  geom_density(aes(x = inc, y = ..density..),col = "#99CC00",size = 2) +
+  labs(title = "Population of Income of ZU Students") +
+  geom_vline(xintercept = mean(inc),color = "#00CC33",size = 2) +
+  geom_vline(xintercept = mean(inc) + 200,color = "#009900",size = 2) +
+  geom_vline(xintercept = mean(inc) - 200,color = "#009900",size = 2) +
+  theme_minimal()
 ```
 
 Since we have simulated the population, we are in a position where we know:
@@ -54,7 +53,9 @@ Suppose now we are interested in the mean of the population (the green line). Gi
 ## Estimating the First Moment / Expected Value
 
 Given a random sample $\{X_1, X_2, \dots, X_n\}$ we can calculate the **sample mean** by:
-$$ \bar{X} = \frac{1}{n} \sum_{i=1}^n X_i $$
+
+$$ \bar{X} = \frac{1}{n} \sum_{i=1}^n X_i  \qquad \text{sample estimator for } \mu_{inc}$$
+
 which is also known as the *arithmetic mean*. Let's simulate a random sample from our ZU students income:
 
 ```{r message=FALSE, warning=FALSE}

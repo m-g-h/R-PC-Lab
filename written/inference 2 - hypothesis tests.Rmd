@@ -30,7 +30,7 @@ In this scenario (which is the realistic scenario) we do the following:
 
 **Assume the population distribution and a value for our parameter of interest. Then estimate the unknown parameters from a sample and test if our assumptions are reasonable.**
 
-This procedure is called 
+This procedure is called hypothesis testing
 
 Assume that the distribution of the population is normal (e.g. because it is reasonably from theory)#
 
