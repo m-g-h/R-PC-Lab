@@ -94,6 +94,9 @@ For any constants $a$ and $b$ and a random variable $X$, it has the following us
 - Standard deviation of a linear combination:
 $$ sd[a X + b] = |a| sd[X] $$
 
+- The variance of a sum of random variables is the sum of the evariance, given independence:
+$$ Var\left[ \sum_{i=1}^n X_i \right] = \sum_{i=1}^n Var[X_i] = \sum_{i=1}^n Var[X_i] $$
+
 - The standard deviation is often denoted by $\sigma$ or $\sigma_X$ instead of $sd[X]$.
 
 ## Standardisation of Variables

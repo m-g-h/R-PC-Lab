@@ -16,9 +16,21 @@ knitr::opts_chunk$set(fig.width=10)
 
 ## Introduction
 
-This section covers a fundamental part of inference: hypothesis testing. Tests of hypotheses are frequently applied in econometrics, e.g. t-tests for OLS parameters or in tests for heteroscedasticity.
+This section covers a fundamental part of inference: hypothesis testing. 
 
-We use hypothesis testing, because we don't much about our populations, just from a sample.
+Tests of hypotheses are frequently applied in econometrics, e.g. t-tests for OLS parameters or in tests for heteroscedasticity.
+
+In this section we will:
+
+- Take a look at the general hypothesis testing procedure
+- Derive hypothesis testing with a simulation
+- Learn how to do hypothesis testing in R
+
+## Introduction
+
+- In the previous part I assumed that we know the population. Actually -- in practice -- we don't
+
+- We use hypothesis testing because we don't much about our populations.
 
 **We actually don't know**:
 
@@ -30,16 +42,20 @@ We use hypothesis testing, because we don't much about our populations, just fro
 
 In this scenario (which is the realistic scenario) we do the following:
 
-**Assume the population distribution and a value for our parameter of interest. Then estimate the unknown parameters from a sample and test if our assumptions are reasonable.**
+1. **Assume the population distribution and a value for our parameter of interest**
+2. **Then estimate the unknown parameters from a sample**
+3. **Test if our assumptions are reasonable**
 
-This procedure is called hypothesis testing
+ 
 
 ## Formal Hypothesis Testing Procedure
 
 Assume that the distribution of the population is normal (e.g. because it is reasonably from theory)
 
-1. Formulate a hypothesis about our population mean (e.g. $H_0:\mu_X = 1000$)
-2. Estimate the mean with the arithmetic mean $\bar{X}$
+1. Formulate a hypothesis about our population parameter (e.g. $H_0:\mu_X = 1000$)
+    1.1 Also the alternative hypothesis $H_1: \mu_X \neq 1000$
+2. Estimate the parameter
+    - In this case with the arithmetic mean $\bar{X}$
 3. Estimate the variance and derive the sample standard deviation $S_X$
 4. Standardise $\bar{X}$ using our estimated $S_X$ and the assumed $\mu_X$
 5. Calculate the probability that our observed $\bar{X}$ is from the population, given a specific level of certainty (e.g. $95 \%$)
@@ -80,7 +96,7 @@ sample_2 <- sample(x = inc_2, size = sample_n, replace = F)
 ```
 
 
-```{r fig.height=4, fig.width=9}
+```{r}
 ggplot() +
 geom_histogram(aes(x = sample_2,
 y = ..density..),binwidth = 50,alpha = 0.8) +
@@ -105,7 +121,7 @@ inc_bar <- mean(sample_2)
 inc_bar
 ```
 
-##3. Estimate the sampling variance $S^2$ and derive the sampling standard deviation $S$ :
+##3. Estimate the sampling variance $S^2_{inc}$ and derive the sampling standard deviation $S_{inc}$ :
 ```{r echo=TRUE}
 var(sample_2)
 ```
@@ -118,7 +134,7 @@ S_inc
 
 At this state we would expect our sample mean to be distributed like this:
 
-```{r fig.height=4, fig.width=9}
+```{r}
 ggplot(data =  data.frame(X_bar = 850:1030), aes(x=X_bar)) +
   stat_function(fun = dnorm, args = list(mean = mu_inc, sd = S_inc/sqrt(sample_n)), size = 2) +
   geom_vline(xintercept = inc_bar, color = "red", size = 1.5) +
@@ -127,14 +143,15 @@ ggplot(data =  data.frame(X_bar = 850:1030), aes(x=X_bar)) +
   theme_minimal()
 ```
 
-## 4. Standardise $\bar{X}$ so we can easily calculate probabilities
+Note that we used the *assumed* mean ZU student income $\mu_{inc} =940€$ (green line). If our $H_0$ would be true, this would be our estimator distribution.
+
+## 4. Standardise $\bar{X}$ to calculate probabilities
 
 ```{r echo=TRUE}
-Z_inc_bar <- (inc_bar - 940) / (S_inc / sqrt(sample_n))
-Z_inc_bar
+Z_inc_bar <- (inc_bar - 940) / (S_inc / sqrt(sample_n)) ; Z_inc_bar
 ```
 
-```{r fig.height=4, fig.width=9}
+```{r}
 ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   stat_function(fun = dnorm, args = list(mean = 0, sd = 1), size = 2) +
   geom_vline(xintercept = Z_inc_bar, color = "red", size = 1.5) +
@@ -143,12 +160,11 @@ ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   theme_minimal()
 ```
 
-##5. Calculate probability of $\bar{X}$ occuring at 5% significance level
+##5. Calculate probability of $\bar{X}$ occuring at 10% significance level
 
-Look up $z-value$ for $1-5\% = 95\%$, e.g. in this [table]{http://www.z-table.com/}.
-$$ z_{1-\alpha} = 1.65 $$
+Look up $z-value$ for $1-10\% = 90\%$, e.g. in this [table](http://www.z-table.com/). $z_{90\%} = 1.65$
 
-```{r fig.height=4, fig.width=9}
+```{r}
 ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   stat_function(fun = dnorm, args = list(mean = 0, sd = 1), size = 2) +
     stat_function(fun = dnorm, xlim = c(-4,1.65), geom = "area", fill = "grey", alpha=0.5) +
@@ -158,3 +174,29 @@ ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   labs(title = "Assumed PDF of our standardised sample mean under H0") +
   theme_minimal()
 ```
+
+## P-Values
+
+So called *p-values* are often used and reported in statistical work. They indicate the highest level of significance at which we can reject the $H_0$.
+
+In our example, we could not only reject the $H_0$ at the $10\%$ level, but also at the $5\%$ level:
+
+```{r}
+ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1), size = 2) +
+    stat_function(fun = dnorm, xlim = c(-4,1.65), geom = "area", fill = "grey", alpha=0.5) +
+  stat_function(fun = dnorm, xlim = c(1.65,1.96), geom = "area", fill = "darkgrey", alpha=0.5) +
+  stat_function(fun = dnorm, xlim = c(1.96,4), geom = "area", fill = "black", alpha=0.5) +
+  geom_vline(xintercept = Z_inc_bar, color = "red", size = 1.5) +
+  geom_vline(xintercept = 0, color = "green", size = 1.5) +
+  labs(title = "Assumed PDF of our standardised sample mean under H0") +
+  theme_minimal()
+```
+
+But at most, we could reject it at the level of our test-statistic. So we just need to look up the corresponding value for $Z_\bar{inc}$ in the [z- table](http://www.z-table.com/) or with r:
+
+```{r}
+1- pnorm(Z_inc_bar)
+```
+
+This is our p-value. It tells us that we can reject the $H_0$ at most at a significance level of $\approx 1.6 \%$.
