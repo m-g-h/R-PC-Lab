@@ -1,0 +1,251 @@
+---
+title: "Inference 1 - Estimators and Bias"
+output:
+  ioslides_presentation:
+    widescreen: yes
+  slidy_presentation: default
+  beamer_presentation:
+    theme: metropolis
+---
+
+```{r setup, include=FALSE }
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(fig.height=4)
+knitr::opts_chunk$set(fig.width=10)
+```
+
+## Introduction
+
+Using our knowledge of random variables and their properties, we are now able to conduct some basic inference. This means that we can utilise the *information from a random sample* of i.i.d. variables to learn something about the *population* of these variables.
+
+## Simulated Population
+
+Let's look at an example. Suppose know the population of ZU students income:
+
+```{r echo=TRUE, fig.height=4, fig.width=10}
+set.seed(11) # seed for reproducibility
+
+n <- 1200
+inc <- rnorm(n, mean = 1000, sd = 200)
+
+print(inc[1:50])
+```
+
+## Simulated Population
+
+```{r fig.height=4, fig.width=10}
+library(ggplot2)
+ggplot() +
+  geom_histogram(aes(x = inc, y = ..density..),binwidth = 60,alpha = 0.8) +
+  geom_density(aes(x = inc, y = ..density..),col = "#99CC00",size = 2) +
+  labs(title = "Population of Income of ZU Students") +
+  geom_vline(xintercept = mean(inc),color = "#00CC33",size = 2) +
+  geom_vline(xintercept = mean(inc) + 200,color = "#009900",size = 2) +
+  geom_vline(xintercept = mean(inc) - 200,color = "#009900",size = 2) +
+  theme_minimal()
+```
+
+- Population mean: $\mu_{inc} = 1000$
+- Population standard deviation: $\sigma_{inc} = 200$
+
+## Simulated Population
+
+Since we have simulated the population, we are in a position where we know:
+
+- The true population mean $\mu_{inc} = 1000€$
+- The true population variance $\sigma_{inc}^2$ and standard deviation $\sigma_{inc} = 200$
+- The distribution of inc: $inc \sim N(\mu_{inc},\sigma_{inc})$
+
+
+Suppose now we are interested in the mean of the population (the green line). Given a sample from this distribution, our task now is to estimate the population mean as good as we can.
+
+## Estimating the First Moment / Expected Value
+
+Given a random sample $\{X_1, X_2, \dots, X_n\}$ we can calculate the **sample mean** by:
+
+$$ \bar{X} = \frac{1}{n} \sum_{i=1}^n X_i \qquad \text{sample estimator for } \mu_{inc}$$
+
+which is also known as the *arithmetic mean*. Let's simulate a random sample from our ZU students income:
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+set.seed(24)
+sample_1 <- sample(x = inc, size = 50, replace = F)
+print(sample_1[1:10])
+```
+
+## Estimating the First Moment / Expected Value
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+ggplot() +
+geom_histogram(aes(x = sample_1,
+y = ..density..),binwidth = 50,alpha = 0.8) +
+labs(title = "SAMPLE Histogram Income ZU Students",
+subtitle = paste0("green = population mean, ",
+                  "red = SAMPLE mean:",
+                  mean(sample_1) %>% round(2))) +
+geom_vline(xintercept = mean(sample_1),color = "red",size = 2) +
+  geom_vline(xintercept = mean(inc),color = "#00CC33",size = 2)+
+theme_minimal()
+```
+
+But how can we draw an inference about the **population mean** $\mu_X$ from this? It could well be that our proposed $\bar{X}$ is a very bad estimator for $\mu_X$.
+
+## Introducing Unbiasedness
+
+Unbiasedness means that our **estimator derived from a random sample on average predicts the population parameter**. In our case we expect the *arithmetic mean* (red line) from our sample to predict, on average, the *population mean* (green line), i.e. that $\bar{X}$ would have a distribution so that:
+$$ \mathbb{E}[\bar{X}] = \mu_X $$
+
+Notice how we now treat our $\bar{X}$ as if it were a random variable --- thats because it is! Since it is a linear combination of random variables $X_i$ with a constant $n^{-1}$, we can treat it just like we would treat any other random variable.
+
+The bias of our estimator is then given by:
+$$ \begin{aligned}
+Bias[\bar{X}] &= \mathbb{E}[\bar{X}] - \mu_X \\
+&= 0 & \text{if the estimator is unbiased}
+\end{aligned}
+$$
+
+## Introducing Unbiasedness
+
+So if $\mathbb{E}[\bar{X}]$ is equal to $\mu_X$, our arithmetic mean would be unbiased. Lets prove this:
+
+$$\begin{aligned}
+\mathbb{E}[\bar{X}] &= \mathbb{E} \left[ \frac{1}{n} \sum_{i=1}^n X_i \right] = \frac{1}{n} \mathbb{E} \left[ \sum_{i=1}^n X_i \right] \\
+&= \frac{1}{n} \sum_{i=1}^n \mathbb{E} [X_i] = \frac{1}{n} \sum_{i=1}^n \mu_X \\
+&= \frac{1}{n} n \mu_X \\
+&= \mu_X
+\end{aligned}
+$$
+
+## Introducing the Sampling Variance
+
+**Not to be confused with the SAMPLE variance**: here we caluclate the variance of an estimator *derived from* the sample, not the variance *of the* sample itself!
+
+Knowing that our arithmetic mean, on average, hits the population mean is good to know. But how often (or by how much) does it deviate from it? It would be nice to know the variability or spread of our estimator. As we learned, the variability of a random variable can be calculated as the variance:
+
+$$ Var[\bar{X}] = \frac{\sigma_X^2}{n} $$
+
+The proof of this is very similar to the proof above, you might want to give it a try yourself.
+
+The sampling standard deviation is then given by:
+$$ sd[\bar{X}] = \frac{\sigma_X}{\sqrt{n}} $$
+
+## The distribution of our Estimator
+
+Since we now know the first two moments of our sample mean $\bar{X}$, we can draw its distribution (given that is it is normally distributed):
+
+$$ \mathbb{E}[\bar{inc}] = \mu_{inc} = 1000 $$
+$$sd[\bar{inc}]= \frac{\sigma_{inc}}{\sqrt{n}} = \frac{200}{\sqrt{50}} = 28.28$$
+
+So we know now that our sample mean is distributed normally with mean $1000$ and standard deviation $28.28$. This is crucial: now we *know* how our estimator for the mean is distributed
+
+## The distribution of our Estimator
+
+```{r}
+ggplot(data =  data.frame(X_bar = 900:1100), aes(x=X_bar)) +
+  stat_function(fun = dnorm, args = list(mean = 1000, sd = 200/sqrt(50)), size = 2) +
+  geom_vline(xintercept = mean(sample_1), color = "red", size = 1.5) +
+  geom_vline(xintercept = 1000, color = "#00CC33", size = 1.5) +
+  geom_vline(xintercept = 910, color = "blue", size = 1.5) +
+  labs(title = "PDF of our sample mean") +
+  theme_minimal()
+```
+
+As we can see, it is quite likely to observe a mean ZU student income like  $\bar{X} = 998.4€$ from a random sample. If we had observed an income of $910€$ (blue line), we could have concluded that our sample was very unlikely from the population of ZU students.
+
+## Interval estimation
+
+Given that we know the  population mean and variance, we can construct an interval around our estimated mean student income that contains the population mean income with a certain probability.
+
+How? since we know that our sample mean is distributed normally, we can standardise it:
+
+$$ Z= \frac{X - \mu_X}{\sigma_X} \qquad \text{general z-standardisation formula} $$
+$$ Z_{\bar{inc}} = \frac{\bar{inc} - \mu_{inc}}{\sigma_{inc} / \sqrt{n}} = \frac{998.4 -1000}{28.28} = - 0.056$$
+
+and take the fact that $95 \%$ of the values of a standard normal variable lie in the interval $[-1.96, 1.96]$ (see [z-table](http://www.z-table.com/) to see how likely our sampled mean income is from our population
+
+## Interval estimation
+
+```{r}
+ggplot(data =  data.frame(X_bar = -4:4), aes(x=X_bar)) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1), size = 2) +
+  stat_function(fun = dnorm, xlim = c(-1.96,1.96), geom = "area", fill = "darkgrey", alpha=0.5) +
+  stat_function(fun = dnorm, xlim = c(-4,-1.96), geom = "area", fill = "black", alpha=0.5) +
+   stat_function(fun = dnorm, xlim = c(1.96,4), geom = "area", fill = "black", alpha=0.5) +
+  geom_vline(xintercept = (mean(sample_1) - 1000) / (200/sqrt(50)), color = "red", size = 1.5) +
+geom_vline(xintercept = (910 - 1000) / (200/sqrt(50)), color = "blue", size = 1.5) +
+  geom_vline(xintercept = 0, color = "green", size = 1.5) +
+  labs(title = "PDF of our sample mean") +
+  theme_minimal()
+```
+
+Only in $5\%$ of cases we observe sample means in the dark grey area. That means, if we have an income sample and calculate a mean income of $910€$, we can conclude that the sample is very unlikely to be from the ZU students population.
+
+## Confidence Interval
+
+We can also construct an interval around our sampled mean income $\bar{inc}$ that contains $\mu_{inc}$ with $95 \%$ probability:
+
+$$ \left[ \bar{x} - \frac{1.96 \sigma_X }{\sqrt{n}}, \bar{x} + \frac{1.96 \sigma_X }{\sqrt{n}}   \right]  \qquad \text{general confidence interval formula}$$
+
+
+## Confidence Interval
+
+$$ \begin{aligned} 
+\left[ \bar{inc} - \frac{1.96 \sigma_{inc} }{\sqrt{n}}, \bar{inc} + \frac{1.96 \sigma_{inc} }{\sqrt{n}}   \right] 
+&= \left[ 998.4 - \frac{1.96 *200 }{\sqrt{50}}, 998.4 + \frac{1.96 *200 }{\sqrt{50}}   \right] \\
+&= [942.96,1053,84] 
+\end{aligned}$$
+
+```{r}
+ggplot(data =  data.frame(X_bar = 900:1100), aes(x=X_bar)) +
+  stat_function(fun = dnorm, args = list(mean = 1000, sd = 200/sqrt(50)), size = 2) +
+  geom_vline(xintercept = mean(sample_1), color = "red", size = 1.5) +
+  geom_vline(xintercept = 1000, color = "green", size = 1.5) +
+  geom_vline(xintercept = mean(sample_1) - (1.96 * 200 /sqrt(50)), color = "darkred", size = 1.5) +
+  geom_vline(xintercept = mean(sample_1) + (1.96 * 200 /sqrt(50)), color = "darkred", size = 1.5) +
+  labs(title = "PDF of our sample mean") +
+  theme_minimal()
+```
+
+
+So we can in $95 \%$ of cases our true mean ZU student income lies in the interval denoted by the red lines, in this case $[987,1009]$. 
+
+## Confidence Interval
+
+But we could also observe in, $5\%$ of cases, interval estimates that don't contain the true mean ZU student income:
+
+```{r}
+ggplot(data =  data.frame(X_bar = 900:1100), aes(x=X_bar)) +
+  stat_function(fun = dnorm, args = list(mean = 1000, sd = 200/sqrt(50)), size = 2) +
+  geom_vline(xintercept = 910, color = "blue", size = 1.5) +
+  geom_vline(xintercept = 1000, color = "green", size = 1.5) +
+  geom_vline(xintercept = 910 - (1.96 * 200 /sqrt(50)), color = "darkblue", size = 1.5) +
+  geom_vline(xintercept = 910 + (1.96 * 200 /sqrt(50)), color = "darkblue", size = 1.5) +
+  labs(title = "PDF of our sample mean") +
+  theme_minimal()
+```
+
+## Estimating the Second Moment / Variance
+
+Estimating the variance of the sample is useful, e.g. if we would like to calculate the *sampling variance* described just above. An unbiased estimator of the first moment -- the *sample variance* -- is given by:
+
+$$ S^2 = \frac{1}{n-1} \sum_{i=1}^2 (X_i - \bar{X})^2 $$
+
+We divide by $\frac{1}{n-1}$ because we use $\bar{X}$ and not $\mu_X$. The details can be looked up  [here](https://en.wikipedia.org/wiki/Variance#Sample_variance).
+
+## Estimating the Second Moment / Variance
+
+The sample standard deviation is given by:
+$$ S = \sqrt{S^2} $$
+
+This estimator is not unbiased. However it is a *consistent* estimator for $\sigma$ and we can still use it. For the sake of brevity we will skip the discussion of consistency here.
+
+## Summary of Estimators and Bias
+
+- The mean of a random sample can be estimated by the arithmetic mean 
+- This arithmetic mean can be treated as a random variable. E.g.:
+    - We can measure its bias by calculating its expected value
+    - We can measure its *sampling variance* by calculating its variance
+- If we know the population variance $\sigma_X$, we can construct a confidence interval from a random sample
+    - For $95 \%$ of samples, the true population mean $\mu_X$ will lie in this interval
+- We can also estimate the sample variance and standard deviation, for the cases in which we don't know the population variance $\sigma_X$
