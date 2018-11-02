@@ -10,7 +10,7 @@ output:
 ---
 
 # Hello
-Blabla this section introduces you to bla
+<span style="color:red">Blabla this section introduces you to bla</span>
 
 # Random Variables
 Random variables are variables that take on numerical values and are determined by experiments. Mathematically speaking, probability experiments (or trials) are procedures which can be infinitely repeated and which have a well-defined set of possible outcomes. These outcomes are affected by chance.
@@ -36,11 +36,14 @@ If we would additionally conduct another experiment where we count two successiv
 - Use **capital letters** such as $O$ or $P$ to denote a **random variable**
 - Use **small letters** such as $m$ or $n$ to denote **particual outcomes** of $M$ and $N$
 - Use **subscripts** (e.g. $a_i$) to distinct **different instances** of the same random variable
+<span style="color:red">\\ben: $a_i$ kann auch benutzt werden, um outcomes verschiedener variablen $A_i$ zu denoten (s. wooldridge)</span>
 
 ## Discrete random variables
 Discrete random variables are variables which can only take a countable number of values. For our cointoss example, $X$ is a random variable with $j = 2$ outcomes, $\{0, 1\}$ (no head, head). Then the probability of each outcome is:
 
-$$p_j = P(X = x_j), \; j = 1, 2 \qquad \text{with } p_1 + p_2 = 1$$  
+$$p_j = P(X = x_j), \; j = 1, 2 \qquad \text{with } p_1 + p_2 = 1$$
+
+Random variables which can only take on two values are called **Bernoulli random variables**
 
 ### Example:drawing a card and predicting its symbol 
 
@@ -48,8 +51,97 @@ $$p_j = P(X = x_j), \; j = 1, 2 \qquad \text{with } p_1 + p_2 = 1$$
 - We have $j = 4$ possible outcomes for $C$, $\{hearts, spades, clubs, diamonds\}$
 - The probabilities are denoted as: $p_j = P(C = c_j), \; j= 1, 2, \dots , 4$
 - Since we know that each symbol is represented equally in the deck, $p_j = 0.25$ for all $j$.
+- The probability to draw a joker is $0$ since the sample space only includes the four symbols.
+- Likewise, the probability to draw any of the four symbol is $1$ ($100%$).
+
+## Continuous random variables
+We call a random variable continuous if it takes on any real value with a probability of $0%$. This is because the variable could essentially take on an infinity of values and $100%$ divided by infinity is (~~not possible~~) approaching $0%$. Continuous random variables are seldom observed in everyday life, but one pseudo-example is the height of a person. Usually a person's height ranges somewhere between $45cm$ and $272cm$. It is true that it is unlikely that someone's height would take on a negative value or one that is generally outside the above-mentioned range. However, within the range, there is still an infinity of exact values that a person's height can take on (consider my height: $182,6732467cm$, still taller than my neighbour, who measures $182,6732466cm$).
+
 
 # Probability Density Functions and Cumulative Density Functions
+
+## Discrete random variables
+For discrete random variables, the probability density function (pdf), or rather, the probability mass function (pmf) summarises the information concerning the possible outcomes of a discrete random variable $X$ and its corresponding probabilities. It is defined as: $$f_X(x) = P(X=x)$$ For our card symbol example, a pmf would look like this:
+```{r}
+library(ggplot2)
+
+p <- rep(0.25,4)
+symbols <- factor(c(0,1,2,3), labels=c("Hearts","Spades",
+                                         "Clubs", "Diamonds"))
+df = data.frame(p, symbols)
+ggplot(df, aes(symbols,p, fill=symbols)) + 
+  geom_bar(stat="identity",width = 0.05) +
+  scale_y_continuous(limits=c(0,1)) + labs(y="f(x)", x="Symbols") +
+  scale_fill_manual("legend",
+                    values = c("Hearts" = "red", "Spades" = "black",
+                               "Clubs" = "black", "Diamonds" = "red")) + 
+  guides(fill=F) + theme_minimal()
+```
+
+With this pmf, we can now simply calculate the probability of any event involving that variable. For instance, we could ask ourselves: "What is the probability that the symbol of the card that I will draw is either Hearts or Clubs?". The pmf tells us: $$\begin{aligned}&P(X=\text{Hearts or } X=\text{Clubs})\\&=P(X=\text{Hearts}) + P(X=\text{Clubs})\\&=0.25 + 0.25 = 0.5\end{aligned}$$  
+We could also answer that question with the help of the cumulative density function (cdf). As the name already suggests, the cdf cumulates the probabilities of the single possible outcomes and is defined as $$F(x) = \sum_{X\leq x}f_X(x)=P(X\leq x)$$ Our current example with the cards does not really suit the benefits of a cdf, as we could indeed read from the function the probability of drawing either a Hearts card or a Spades card, but we are unable to read from it the probability of drawing either a Diamonds card or a Hearts card:
+```{r}
+df$xend <- c(df$symbols[2:nrow(df)], 5)
+df$yend <- cumsum(df$p)
+ggplot(df, aes(as.numeric(symbols), cumsum(p), xend=xend, yend=yend, color=symbols)) +
+      #geom_vline(aes(xintercept=as.numeric(symbols)), linetype=2, color="grey") +
+      geom_point() +
+      geom_point(aes(x=xend, y=cumsum(p)), shape=1) + 
+      geom_segment() +
+      scale_color_manual("legend",
+                    values = c("Hearts" = "red", "Spades" = "black",
+                               "Clubs" = "black", "Diamonds" = "red")) +
+      scale_x_continuous(breaks = 1:5, 
+                         labels = c("Hearts", "Spades",
+                                    "Clubs", "Diamonds", "")) +
+      guides(color=F) +
+      theme_minimal()
+
+```
+
+## Continuous random variables
+
+Because it makes little sense to think about the probability that a continuous random variable assumes a certain value, the pdf of continuous random variables is used to calculate events concerning a range of values. This is done by taking the integral of this range. Generally: $$F_X(x) = \int f_X(x) dx$$
+
+In our height example, we could be interested in the probability that a person is somewhere between $170cm$ and $180cm$ tall, i.e. in $P(170\leq X \leq 180)$.
+```{r}
+height = rnorm(10000, mean=177, sd=30)
+df = data.frame(height)
+dp <- ggplot(df, aes(height)) + geom_density(size=1) + 
+  geom_vline(aes(xintercept=mean(height)), color="red", linetype="dashed",
+                 size=1)
+dpb <- ggplot_build(dp)
+x1 <- min(which(dpb$data[[1]]$x >=170))
+x2 <- max(which(dpb$data[[1]]$x <=180))
+dp + geom_area(data=data.frame(x=dpb$data[[1]]$x[x1:x2],
+                               y=dpb$data[[1]]$y[x1:x2]),
+               aes(x=x, y=y), fill="blue", alpha=0.1) +
+    theme_minimal() + 
+    theme(axis.title.y=element_blank(),
+          axis.text.y=element_blank()) + labs(x="Height")
+```
+```{r}
+library(sfsmisc)
+dens = density(df$height)
+integrate.xy(dens$x, dens$y,170,180)
+```
+Thus, $P(170\leq X \leq 180) \approx 0.13 = 13%$ (the integrate.xy function is not exact).
+
+While we can calculate probabilities under the pdf for a given Range $P(a \leq X \leq b)$, the cumulative density function always provides us with the probability of the variable to take on a value *up to* $x$, that is, $P(X \leq x)$. Its definition is: $$F_X(x)=\int_{-\infty}^xf_X(x)dx$$ At all points its value is the total area under the curve of the pdf up to $x$.
+
+```{r}
+df_int = data.frame(height=dens$x, y=cumsum(dens$y)/2)
+ggplot(df_int, aes(height,y)) + geom_line(size=1) + 
+  geom_vline(aes(xintercept=mean(height)), color="red", linetype="dashed",
+                 size=1) +
+  scale_x_continuous(breaks=seq(50,300,50)) + 
+  scale_y_continuous(breaks=seq(0,1,0.2)) +
+  theme_minimal() + labs(x="Height", y="F(x)")
+```
+From this graph we can now easily read the probability that a person is $150cm$ tall or smaller (ca. $20%$). For the requirements and attributes of probability density functions and cumulative density functions, please refer to the course slides.
+
+
+# Joint Distributions and Conditional Distributions
 
 # Features of Probability Distributions
 
