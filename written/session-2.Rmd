@@ -147,9 +147,9 @@ We often have to deail with more than just one variable in applied econometrics.
 ## Joint Distributions
 
 ### The discrete case
-Let $X$ be a random variable for the throw of a die with equal chances to every side, and $Y$ a random variable for the color (blue, red) of the die. Throwing a random die would lead us to the joint probability density function of $(X,Y)$: $$f_{X,Y}(x,y) = P(X=x, Y=y)$$.
+Let $Y$ be a random variable for the throw of a die with equal chances to every side, and $X$ a random variable for the color (blue, red) of the die. Throwing a random die would lead us to the joint probability density function of $(X,Y)$: $$f_{X,Y}(x,y) = P(X=x, Y=y)$$.
 
-It is quite easy to obtain the joint pdf of $X$ and $Y$ if they are independent. $X$ and $Y$ are independent if: $$f_{X,Y}(x,y) = f_X(x)f_Y(y)$$ In other words, they are independent if the die side thrown does not depend on the color of the die. In the discrete case, it is the same as $$P(X=x, Y=y) = P(X=x)P(Y=y)\text{,}$$ that is, the probability that the die is read and you throw a 6 is the product of the probability of throwing a 6 and of the die being red. Since we know these probabilities, we can calculate: $\frac{1}{6} \times \frac{1}{2} = \frac{1}{12}$.
+It is quite easy to obtain the joint pdf of $X$ and $Y$ if they are independent. $X$ and $Y$ are independent if: $$f_{X,Y}(x,y) = f_X(x)f_Y(y)$$ In other words, they are independent if the die side thrown does not depend on the color of the die. In the discrete case, it is the same as $$P(X=x, Y=y) = P(X=x)P(Y=y)\text{,}$$ that is, the probability that the die is read and you throw a 6 is the product of the probability of throwing a 6 and of the die being red. Since we know these probabilities, we can calculate: $\frac{1}{2} \times \frac{1}{6} = \frac{1}{12}$.
 
 ### The continuous case
 By taking the integral of a joint pdf of continous variables, we can get the probability that X and Y fall in a certain interval: $$P(a \leq X \leq b, c \leq Y \leq d) = \int_a^b \int_c^df_{X,Y}(x,y)dydx$$
@@ -180,9 +180,9 @@ scatterplot3js(x=xx, y=yy, z=zz, size=0.4, color=col[ra], bg="white")
 ## Conditional Distributions
 When we are interested in the probability of a specific outcome given we observed another specific outcome, we might want to take a look at the conditional distribution of $Y$ given $X$, or rather, at the **conditional probability density function**: $$\frac{f_{Y|X}(y|x)}{f_X(x)}$$
 For the discrete case follows: $$f_{X|Y}(y|x) = P(Y=y|X=x)$$
-When $X$ and $Y$ are independent, it follows from $f_{X,Y}(x,y) = f_X(x)f_Y(y)$ that $$f_{X|Y}(y|x) = f_Y(y)$$
-
-$f_{X,Y}(x,y) = f_X(x)f_Y(y)$
+When $X$ and $Y$ are independent, it follows from $f_{X,Y}(x,y) = f_X(x)f_Y(y)$ that $$f_{X|Y}(y|x) = f_Y(y)\text{.}$$
+Let us consider the die example again ($Y$ being the colour, $X$ the number), but lets say that if the die is blue, the chance of throwing a $6$ is $80%$, while the chances are distributed equally with the red die. Then: $$\begin{aligned}f_{Y|X}(6|\text{blue})&=.80\\f_{Y|X}(6|\text{red})&=\frac{1}{6}\end{aligned}$$
+We can also calculate $P(X=\text{blue}, Y=6)$ if we know $P(X=\text{blue}$. If the probability of getting the blue die is $60%$, then $$P(X=\text{blue}, Y=6) = P(Y=6|X=\text{blue})\times P(X=\text{blue}) = .80 \times .60 = .48 = 48%$$
 
 
 # Features of Probability Distributions
@@ -361,12 +361,34 @@ $$  Corr[X,Y] = \frac{Cov[X,Y]}{sd[X] sd[Y]} = \frac{\sigma_{XY}}{\sigma_X \sigm
 
 # Simple Linear Regression and OLS
 Now that we have learned about correlation and testing, we want to predict one variable from another. One simple way to do so is using linear regression. Simple linear regression (SLR) is about predicting a dependent variable (*regressand*) from one independent variable (*regressor*). A SLR model is given by: $$y = \beta_0 + \beta_1x + \epsilon$$
-where $y$ is the regressand and $x$ the regressor. $\epsilon$ denotes the error of the model, i.e. the residuals. Usually, researchers are interested in the amount of change in $y$ that occur when $x$ changes. As in any linear function, the rate of change is given by $\beta_1$. More formally: $$\frac{\delta y}{\delta x} = \beta_1$$
+where $y$ is the regressand and $x$ the regressor. $\epsilon$ denotes the error of the model, i.e. the residuals. Regression is often used to model real-world relationships.
 
-## Explanation by example
-Now what does a linear regression model tell us? It tells us the relation between two variables and in the best case lets us predict the outcome if we have information about the independent variable. Assume that we have ten students who took exams in statistics and exams in econometrics. We know what grades were in percentage points. Now, we would like to predict the econometrics grade of any other student who took the statistics exam. Our model is as follows:
+Basically, a linear regression model is nothing else other than a linear function $y=mx+b$. In the regression case, $\beta_0$ is $b$, and $\beta_1$ is $m$, the slope. The regression line is the one line that crosses or passes the observation with the smallest amount of squared error.
+```{r echo = FALSE}
+library(ggplot2)
+student_id = c(1,2,3,4,5)
+x = c(95,85,80,73,70,65,60,58,55,51)
+y = c(85,95,75,70,65,70,62,53,52,51)
+grades_df = data.frame(student_id, x, y)
+ggplot(grades_df, aes(x, y)) + 
+  geom_point() + labs(x="Statistics Grade", y="Econometrics Grade") + geom_smooth(
+    method="lm", colour="red", se=T, alpha=0.1) + theme_minimal()
+```
+Here, we have a linear model that predicts a student's Econometrics grade from his or her Statistics grade. Notice that the line does not cross a single data point, but it minimises the squared deviations of all the single points from the line. Those deviations are called "residuals" and in a linear regression model, they sum up to zero.
+Lets take a look at the residuals:
+```{r}
+resid = summary(lm(y~x, data=grades_df))$residuals; resid
+round(sum(resid))
+```
+Look at the graph. The rightmost point deviates by $-7.03$ (the first entry of our residuals), the second by $12.36$ etc.
 
-$$econgrade = \beta_0 + \beta_1statsgrade + \epsilon$$
+Usually, researchers are interested in the amount of change in $y$ that occur when $x$ changes. As in any linear function, the rate of change is given by $\beta_1$. More formally: $$\frac{\delta y}{\delta x} = \beta_1$$
+
+## Interpretation by example
+Lets look again at the example. We have ten students who took exams in Statistics and exams in Econometrics. We know what grades were in percentage points. Now, we would like to predict the Econometrics grade of any other student who took the Statistics exam. Our model looks as follows:
+
+$$\hat{econgrade} = \hat{\beta_0} + \hat{\beta_1}statsgrade + \hat{\epsilon}$$
+If you wonder about the hats ($\hat{}$), we use them because now that we look at empirical data, we cannot make any claims about the true or theoretical distribution, but only about our empirical data. We only have estimators, so we use hats to mark them accordingly.
 
 ```{r fig.height=4, fig.width=9}
 library(ggplot2)
@@ -378,11 +400,40 @@ ggplot(grades_df, aes(x, y)) +
   geom_point() + labs(x="Statistics Grade", y="Econometrics Grade") + geom_smooth(
     method="lm", colour="red", se=T, alpha=0.1) + theme_minimal()
 ```
+
 ```{r}
 summary(lm(y~x, data=grades_df))$coefficients
 ```
-Judging from the graph, we have a clear linear relationship between the students' statistics grades and the econometrics grades. In fact, our $\beta_1$, which is also the line's slope, can be read from the summary ($0.939$) and from the Pr-column we also see that this estimate is different from zero (statistically significant, ***). A standard interpretation of this information would go as follows: "Ceteris paribus (with all else being equal, an increase of $1$ of the statistics grade implies an increase of $0.939$ of the econometrics grade. Given the t value which is above our given threshold of $1.96$, we would reject our null hypothesis that the influence of the statistics grade is equal to $0$." We may go even as far and state that if a current student in the econometrics class has achieved a grade of $90$, he will approximately score $87$ points in the econometrics exam.  But we have an essential problem with this interpretation, because we do not actually know that we have a causal relationship here or just a correlation. And right now, we do not know whether the line we drew represents the best guess for a prediction. To answer these questions, we need to know more.
+Once again, we see a clear linear relationship between the students' statistics grades and the econometrics grades. By how much does a student's Econometrics grade increase if the student's Statistics grade was better by one? 
+```{r}
+summary(lm(y~x, data=grades_df))$coefficients
+```
+Look at the Estimate column. The first row in that column ($2.82$) is the *intercept* of the line with the y-axis. The interpretation of that value (which is not always meaningful) would be that if a student scored zero points in his statistics exam, he will score $2.82$ on the Econometrics exam. The second row in the Estimate column is the estimate of the beta coefficient for our x, which is the Statistics grade. It tells us that the $\hat{\beta_1}$ is $0.94$. We would interpret this value as follows: "Ceteris paribus (with all else being equal, an increase of $1$ of the Statistics grade implies an increase of $0.94$ of the Econometrics grade.". Many researchers are also interested in the statistical significance of our estimate. We find the $p$-value to be way below common standards ($0.0002$), so we would reject our null hypothesis (which was that the estimate equal to zero) say that our beta coefficient is statistically significant. What does this mean? It basically means that we can believe that a better Statistics grade really implies a better Econometrics grade.
 
+But we have an essential problem with this interpretation, because we do not actually know that we have a causal relationship here or just a correlation. And right now, we do not know whether the line we drew represents the best guess for a prediction. To answer these questions, we need to know more.
+
+## Ordinary least squares
+As we have heard before, the regression line is a line that fits our points so that it minimises the squared deviations (residuals) of the points from the line. To construct such a line, we need to know the intercept and the slope coefficient(s) for $x$. The formulas are quite simple: $$\begin{align}\hat{\beta_1}&=\frac{Cov[x,y]}{Var[x]}\\\hat{\beta_0}&=\bar{y} - \hat{\beta_1}\bar{x}\text{.}\end{align}$$
+The proof is fun because it is simple. We set up a formal minimization problem because we want to minimize $\hat{\epsilon}^2$.
+$$\min\limits_{\hat{\beta_0},\hat{\beta_1}}\sum_{i=1}^n\hat{u}_i^2 = \sum_{i=1}^n(y_i-\hat{\beta}_0-\hat{\beta}_1x_1)^2$$
+We minimise the function by taking the first order conditions (FOCs) by $\hat{\beta_0}$ and $\hat{\beta_1}$. The first FOCs is (as derived by $\hat{\beta_0}$: $$\begin{aligned}&2\times\sum_{i=1}^n(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0 \text{ | :2} \\
+\iff & \sum_{i=1}^n(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0\\
+\iff & \sum_{i=1}^n(y_i)-\sum_{i=1}^n(\hat{\beta}_0)-\sum_{i=1}^n(\hat{\beta}_1x_i)\stackrel{!}{=}0\\
+\iff & \sum_{i=1}^n(y_i)-n\times\hat{\beta}_0-\sum_{i=1}^n(\hat{\beta}_1x_i)\stackrel{!}{=}0\text{ | } :n\\
+\iff & \bar{y}-\hat{\beta_0}-\hat{\beta_1}\bar{x}\stackrel{!}{=}0\\
+\iff & \hat{\beta_0} = \bar{y} - \hat{\beta_1}\bar{x}
+\end{aligned}$$ 
+
+and then we derive by $\hat{\beta_1}$: 
+$$\begin{aligned}&2\times\sum_{i=1}^n-x_i(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0\text{ | :(-2)} \\
+\iff & \sum_{i=1}^nx_i(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0\\
+\iff & \sum_{i=1}^nx_i(y_i-(\bar{y}-\hat{\beta_1}\bar{x})-\hat{\beta}_1x_i) \stackrel{!}{=} 0\\
+\iff & \sum_{i=1}^nx_i(y_i-\bar{y})+\sum_{i=1}^nx_i(-\hat{\beta_1}\bar{x}-\hat{\beta_1}x_i) \stackrel{!}{=} 0\\
+\iff & \sum_{i=1}^nx_i(y_i-\bar{y})-\hat{\beta_1}\sum_{i=1}^nx_i(x_i-\bar{x}) \stackrel{!}{=} 0\\
+\iff & \sum_{i=1}^nx_i(y_i-\bar{y})=\hat{\beta_1}\sum_{i=1}^nx_i(x_i-\bar{x}) \text{ | counterintuitive but possible:}\\
+\iff & \sum_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})=\hat{\beta_1}\sum_{i=1}^n(x_i-\bar{x})^2\\
+\iff & \hat{\beta_1} = \frac{\sum_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^n(x_i-\bar{x})^2} = \frac{Cov[x,y]}{Var[x]}
+\end{aligned}$$ 
 
 ## Law of Iterated Expectations
 We will shortly learn under which conditions we can assume that we're looking at a causal relationship of $x$ on $y$. But before we do that, we need to know and understand the Law of Iterated Expectations (LEI). It states that the Expectation of $y$ given $x$ is equal to the expectation of $y$:
@@ -403,13 +454,11 @@ Following from this and the Law of Iterated Expectations: $$\begin{aligned}\math
 Effectively, if the expected value of the error term is zero, the model is without error and thus average value of $y$ can be expressed as a linear function of $x$:
 $$\begin{aligned}\mathbb{E}\left[y|x\right] &= \mathbb{E}\left[\beta_0 + \beta_1x + \epsilon|x\right] \\ &= \beta_0 + \beta_1x + \mathbb{E}\left[\epsilon|x\right] \\ &= \beta_0 + \beta_1x \end{aligned}$$
 
-
-
 ## Assumptions
 
 Before interpreting SLR models, one should be aware of its assumptions, namely:
 1. The population model is linear in its parameters: $$y = \beta_0 + \beta_1x + \epsilon$$
-2. Random bla  
+2. The sample at hand is a random sample from the population model.  
 3. There is variation in the $x_i$: $$\sum_{i=1}^n (x_i - \bar{x})^2 > 0$$
 4. $\mathbb{E} \left[\epsilon|x\right] = 0$ and therefore $\mathbb{E} \left[\epsilon_i|x_i\right] = 0$
 5. Homoskedasticity (Equality of variances) is given: $$Var\left[\epsilon|x\right] = Var\left[\epsilon_i|x_i\right] = \sigma^2$$
