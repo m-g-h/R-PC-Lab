@@ -37,6 +37,8 @@ print(X)
  
 If we would additionally conduct another experiment where we count two successive coin tosses (`size = 2`), we would obtain a second random variable, which we would denote by $Y_i$ and $y_i$ respectively.
 
+## A few notational remarks
+
 **Notation:**
 
 - Use **capital letters** such as $O$ or $P$ to denote a **random variable**
@@ -52,7 +54,7 @@ $$p_j = P(X = x_j), \; j = 1, 2 \qquad \text{with } p_1 + p_2 = 1$$
 
  - Random variables which can only take on two values are called **Bernoulli random variables**
 
-### Example:drawing a card and predicting its symbol 
+## Example:drawing a card and predicting its symbol 
 
 - Denote the random variable for the card draw by $C$
 - We have $j = 4$ possible outcomes for $C$, $\{hearts, spades, clubs, diamonds\}$
@@ -72,7 +74,10 @@ $$p_j = P(X = x_j), \; j = 1, 2 \qquad \text{with } p_1 + p_2 = 1$$
 ## Discrete random variables
  - For discrete random variables, the probability density function (pdf), or, the probability mass function (pmf) summarises information about outcomes of $X$ and its probabilities. 
  - Definition: $$f_X(x) = P(X=x)$$ 
- - For the card example: 
+ 
+## Discrete random variables
+
+ For the card example: 
 ```{r warning=FALSE, fig.height=4, fig.width=9}
 library(ggplot2)
 
@@ -119,10 +124,14 @@ ggplot(df, aes(as.numeric(symbols), cumsum(p), xend=xend, yend=yend, color=symbo
 
 - Not very meaningful to think about single outcome probabilities as with discrete random variables
 - PDF of continuous random variables is used to calculate events concerning a range of values. This is done by taking the integral of this range. Generally: $$F_X(x) = \int f_X(x) dx$$
+
+## Continuous random variables
+
 - In the height example: How probable is it for a person to be between $170cm$ and $180cm$ tall, $P(170\leq X \leq 180)$?
 ```{r warning=FALSE, fig.height=4, fig.width=9}
 height = rnorm(10000, mean=177, sd=30)
 df = data.frame(height)
+
 dp <- ggplot(df, aes(height)) + geom_density(size=1) + 
   geom_vline(aes(xintercept=mean(height)), color="red", linetype="dashed",
                  size=1)
@@ -137,18 +146,25 @@ dp + geom_area(data=data.frame(x=dpb$data[[1]]$x[x1:x2],
           axis.text.y=element_blank()) + labs(x="Height")
 ```
 
-```{r warning=FALSE, message=FALSE}
+## Continuous random variables
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
 library(sfsmisc)
+height = rnorm(10000, mean=177, sd=30)
+df = data.frame(height)
 dens = density(df$height)
 integrate.xy(dens$x, dens$y,170,180)
 ```
- - $P(170\leq X \leq 180) \approx 0.13 = 13%$ (the integrate.xy function is not exact).
+ - $P(170\leq X \leq 180) \approx 0.13 = 13\%$ (the integrate.xy function is not exact).
 
----
+## Continuous random variables
 
 The CDF always provides us with the probability of the variable to take on a value *up to* $x$, that is, $P(X \leq x)$. 
  - Definition: $$F_X(x)=\int_{-\infty}^xf_X(x)dx$$
  - At all points its value is the total area under the curve of the pdf up to $x$.
+ 
+## Continuous random variables
+
 
 ```{r warning=FALSE, fig.height=4, fig.width=9}
 df_int = data.frame(height=dens$x, y=cumsum(dens$y)/2)
@@ -159,6 +175,7 @@ ggplot(df_int, aes(height,y)) + geom_line(size=1) +
   scale_y_continuous(breaks=seq(0,1,0.2)) +
   theme_minimal() + labs(x="Height", y="F(x)")
 ```
+
  - Example: $P(X\leq 150) \approx 0.2$. 
  - For the requirements and attributes of probability density functions and cumulative density functions, please refer to the course slides.
 
@@ -194,8 +211,9 @@ ggplot(df_int, aes(height,y)) + geom_line(size=1) +
  - **conditional probability density function**: $$\frac{f_{Y|X}(y|x)}{f_X(x)}$$
  - For the discrete case follows: $$f_{X|Y}(y|x) = P(Y=y|X=x)$$
  - When $X$ and $Y$ are independent, it follows from $f_{X,Y}(x,y) = f_X(x)f_Y(y)$ that $$f_{X|Y}(y|x) = f_Y(y)\text{.}$$
- 
----
+
+## Conditional Distributions
+
 
  - Die example ($Y$ being the colour, $X$ the number)
     - If die is blue, $P(6) = .8$
