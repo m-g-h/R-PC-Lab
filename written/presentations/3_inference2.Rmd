@@ -77,13 +77,12 @@ inc_2 <- rnorm(n, mean = 1000, sd = 200)
 
 ```{r}
 ggplot() +
-geom_histogram(aes(x = inc_2,
-y = ..density..),binwidth = 60,alpha = 0.8) +
-geom_density(aes(x = inc_2,
-y = ..density..),col = "red",size = 2,alpha = 0.8) +
-labs(title = "Income of ZU Students") +
-theme_minimal()
-
+  geom_histogram(aes(x = inc_2,
+                     y = ..density..), binwidth = 60, alpha = 0.8) +
+  geom_density(aes(x = inc_2,
+                   y = ..density..), col = "red", size = 2, alpha = 0.8) +
+  labs(title = "Income of ZU Students") +
+  theme_minimal()
 ```
 
 ## Sample
@@ -98,10 +97,10 @@ sample_2 <- sample(x = inc_2, size = sample_n, replace = F)
 
 ```{r}
 ggplot() +
-geom_histogram(aes(x = sample_2,
-y = ..density..),binwidth = 50,alpha = 0.8) +
-labs(title = "SAMPLE Histogram Income ZU Students") +
-theme_minimal()
+  geom_histogram(aes(x = sample_2,
+                     y = ..density..), binwidth = 50, alpha = 0.8) +
+  labs(title = "SAMPLE Histogram Income ZU Students") +
+  theme_minimal()
 ```
 
 
@@ -148,7 +147,7 @@ Note that we used the *assumed* mean ZU student income $\mu_{inc} =940€$ (gree
 ## 4. Standardise $\bar{X}$ to calculate probabilities
 
 ```{r echo=TRUE}
-Z_inc_bar <- (inc_bar - 940) / (S_inc / sqrt(sample_n)) ; Z_inc_bar
+Z_inc_bar <- (inc_bar - mu_inc) / (S_inc / sqrt(sample_n)) ; Z_inc_bar
 ```
 
 ```{r}
@@ -160,9 +159,9 @@ ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   theme_minimal()
 ```
 
-##5. Calculate probability of $\bar{X}$ occuring at 10% significance level
+##5. Calculate probability of $\bar{X}$ occuring at 5% significance level
 
-Look up $z-value$ for $1-10\% = 90\%$, e.g. in this [table](http://www.z-table.com/). $z_{90\%} = 1.65$
+Look up $z-value$ for $1-5\% = 95\%$, e.g. in this [table](http://www.z-table.com/). $z_{95\%} \approx 1.65$
 
 ```{r}
 ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
@@ -175,16 +174,42 @@ ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   theme_minimal()
 ```
 
+
+## Hypothesis Test
+
+Check whether our standardised estimator $Z_{\bar{inc}}$ is larger than our critical value $c$.
+
+- Critical value $c$: quantile of the standard normal cdf with $P(Z_{bar{inc}} > c) = 95 \%$
+- Test statistic: our standardised estimator
+
+Remember our $H_0: \mu_{inc} < 940€$ and $H_1: \mu_{inc} \geq 940€$. Lets test that in R:
+
+```{r echo=TRUE}
+Z_inc_bar >= qnorm(0.95)
+```
+
+## Hypothesis Test - Other Variants
+
+What we did was only the *right-sided* hypothesis test. 
+
+We could also test other hypotheses:
+
+- Left-sided: $H_0: \mu_{inc} > 940€$ and $H_1: \mu_{inc} \leq 940€$
+    - $\mu_{inc} \leq c$
+- Both-sided: $H_0: \mu_{inc} = 940€$ and $H_1: \mu_{inc} \neq 940€$
+    - $|\mu_{inc}| > c$
+
+
 ## P-Values
 
 So called *p-values* are often used and reported in statistical work. They indicate the highest level of significance at which we can reject the $H_0$.
 
-In our example, we could not only reject the $H_0$ at the $10\%$ level, but also at the $5\%$ level:
+In our example, we could not only reject the $H_0$ at the $5\%$ level, but also at the $2.5\%$ level:
 
 ```{r}
 ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   stat_function(fun = dnorm, args = list(mean = 0, sd = 1), size = 2) +
-    stat_function(fun = dnorm, xlim = c(-4,1.65), geom = "area", fill = "grey", alpha=0.5) +
+  stat_function(fun = dnorm, xlim = c(-4,1.65), geom = "area", fill = "grey", alpha=0.5) +
   stat_function(fun = dnorm, xlim = c(1.65,1.96), geom = "area", fill = "darkgrey", alpha=0.5) +
   stat_function(fun = dnorm, xlim = c(1.96,4), geom = "area", fill = "black", alpha=0.5) +
   geom_vline(xintercept = Z_inc_bar, color = "red", size = 1.5) +
@@ -193,10 +218,39 @@ ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   theme_minimal()
 ```
 
-But at most, we could reject it at the level of our test-statistic. So we just need to look up the corresponding value for $Z_\bar{inc}$ in the [z- table](http://www.z-table.com/) or with r:
+## P-Values
 
-```{r}
+But at most, we could reject it at the level of our test-statistic. So we just need to look up the corresponding value for $Z_\bar{inc}$ in the [z- table](http://www.z-table.com/), or with r:
+
+```{r echo=TRUE}
 1- pnorm(Z_inc_bar)
 ```
 
 This is our p-value. It tells us that we can reject the $H_0$ at most at a significance level of $\approx 1.6 \%$.
+
+## Excercise 1
+
+- Simulate a normally distributed population with $\mu = 5000$,  $\sigma = 450$ of size $1000$ and store it in a variable
+    - Type `?rnorm()` in the console for info on how to use the function
+    - (optional) Plot the population as histogram with `ggplot`
+- Generate a sample of size $n = 70$ and store it in a sample
+    - Type `?sample()` in the console for info on how to use the function
+- Test the hypothesis that $\mu > 5300$ at the $5\%$ significance level
+    - State the $H_0$ and $H_1$
+    - Estimate the sample mean and sampling standard deviation
+    - Standardise the variable
+    - Retrieve the critical value for the $5\%$ level
+    - Test the hypothesis
+    
+## Excercises 2
+
+1. Use the inbuilt  `t.test()` for the hypothesis test and compare the results
+    - specify `x`, `alternative` and `mu`in the function call
+    
+2. Test the hypothesis that the cars in `mtcars` are not very fuel efficient
+    - Load the inbuilt dataset with `mtcars`
+    - Test the hypothesis that the mean miles per gallon is at most 21 at the $10 \%$ significance level
+    
+3. Test the hypothesis that in $1888$ more than $40\%$ of the swiss male population were working in agriculture
+    - use the inbuild `swiss` dataset
+    - use the $ 1\%$ significance level
