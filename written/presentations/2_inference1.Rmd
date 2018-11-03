@@ -1,5 +1,5 @@
 ---
-title: "Inference 1 - Estimators and Bias"
+title: "Inference 1 - Estimation, Bias and Confidence Intervals"
 output:
   ioslides_presentation:
     widescreen: yes
@@ -149,7 +149,7 @@ So if $\mathbb{E}[\bar{X}]$ is equal to $\mu_X$, our arithmetic mean would be un
 <!-- \end{aligned} -->
 <!-- $$ -->
 
-$$ \text{ See whiteboard. The proof will be procided in the script, which will be uploaded} $$
+$$ \text{ See whiteboard. The proof will be procided in the script} $$
 
 ## Introducing the Sampling Variance
  
@@ -324,3 +324,13 @@ This estimator is not unbiased. However it is a *consistent* estimator for $\sig
 - We can easily look up z-values in a z-table or with `qnorm`
 - We can construct confidence intervals around our estimates that are derived from our sampling procedure
     - The population parameter is contained within this intervail with a certain probability
+    
+## Excercises
+
+- Go to (http://www.z-table.com/) and retrieve the z-values for the
+    - $10\%$, $1 \%$ and $0.1 \%$ quantiles
+    - an interval that contains $80 \%$ of the values under the standard normal pdf
+    
+- Retrieve the same values with the `qnorm()` function
+
+- Construct a confidence interval for a sample with $\bar{x} = 50$, $\sigma_x = 5$ and size $n=67$ that contains the true mean with $80 \%$ probability

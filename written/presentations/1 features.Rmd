@@ -280,4 +280,6 @@ $$  Corr[X,Y] = \frac{Cov[X,Y]}{sd[X] sd[Y]} = \frac{\sigma_{XY}}{\sigma_X \sigm
 
 - The population correlation coefficient is usually denoted as $\rho$ or $\rho_{XY}$ instead of $Corr[X,Y]$
 
+
+
  

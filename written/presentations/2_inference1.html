@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Inference 1 - Estimators and Bias</title>
+  <title>Inference 1 - Estimation, Bias and Confidence Intervals</title>
 
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -20,7 +20,7 @@
     var SLIDE_CONFIG = {
       // Slide settings
       settings: {
-                title: 'Inference 1 - Estimators and Bias',
+                title: 'Inference 1 - Estimation, Bias and Confidence Intervals',
                         useBuilds: true,
         usePrettify: true,
         enableSlideAreas: true,
@@ -225,7 +225,7 @@ Bias[\bar{X}] &amp;= \mathbb{E}[\bar{X}] - \mu_X \\
 
 <!-- $$ -->
 
-<p>\[ \text{ See whiteboard. The proof will be procided in the script, which will be uploaded} \]</p>
+<p>\[ \text{ See whiteboard. The proof will be procided in the script} \]</p>
 
 </article></slide><slide class=""><hgroup><h2>Introducing the Sampling Variance</h2></hgroup><article  id="introducing-the-sampling-variance">
 
@@ -362,6 +362,19 @@ Bias[\bar{X}] &amp;= \mathbb{E}[\bar{X}] - \mu_X \\
 <ul>
 <li>The population parameter is contained within this intervail with a certain probability</li>
 </ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Excercises</h2></hgroup><article  id="excercises">
+
+<ul>
+<li>Go to (<a href='http://www.z-table.com/' title=''>http://www.z-table.com/</a>) and retrieve the z-values for the
+
+<ul>
+<li>\(10\%\), \(1 \%\) and \(0.1 \%\) quantiles</li>
+<li>an interval that contains \(80 \%\) of the values under the standard normal pdf</li>
+</ul></li>
+<li><p>Retrieve the same values with the <code>qnorm()</code> function</p></li>
+<li><p>Construct a confidence interval for a sample with \(\bar{x} = 50\), \(\sigma_x = 5\) and size \(n=67\) that contains the true mean with \(80 \%\) probability</p></li>
 </ul></article></slide>
 
 
