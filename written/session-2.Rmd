@@ -29,13 +29,13 @@ print(X)
 
 ```
  
-If we would additionally conduct another experiment where we count two successive coin tosses (`size = 2`), we would obtain a secon random variable, which we would denote by $Y_i$ and $y_i$ respectively.
+If we would additionally conduct another experiment where we count two successive coin tosses (`size = 2`), we would obtain a second random variable, which we would denote by $Y_i$ and $y_i$ respectively.
 
 **Notation:**
 
 - Use **capital letters** such as $O$ or $P$ to denote a **random variable**
 - Use **small letters** such as $m$ or $n$ to denote **particual outcomes** of $M$ and $N$
-- Use **subscripts** (e.g. $a_i$) to distinct **different outcomes** of the same random variable $A_i$
+- Use **subscripts** (e.g. $a_i$) to distinct **different outcomes** of the random variable $A_i$
 <span style="color:red">\\ben: $a_i$ kann auch benutzt werden, um outcomes verschiedener variablen $A_i$ zu denoten (s. wooldridge)</span>
 
 ## Discrete random variables
@@ -142,7 +142,7 @@ ggplot(df_int, aes(height,y)) + geom_line(size=1) +
 From this graph we can now easily read the probability that a person is $150cm$ tall or smaller (ca. $20%$). For the requirements and attributes of probability density functions and cumulative density functions, please refer to the course slides.
 
 # Joint Distributions and Conditional Distributions
-We often have to deail with more than just one variable in applied econometrics. For example, we could be interest in the probability that a person is between $170cm$ and $180cm$ tall *and* weighs between $60kg$ and $90kg$ (this is important for shoe manufacturers). We could also be interested in the probability of getting a $6$ with one throw of a die given the die is red instead of blue (comes in handy at the casino).
+We often have to deail with more than just one variable in applied econometrics. For example, we could be interested in the probability that a person is between $170cm$ and $180cm$ tall *and* weighs between $60kg$ and $90kg$ (this is important for shoe manufacturers). We could also be interested in the probability of getting a $6$ with one throw of a die given the die is red instead of blue (comes in handy at the casino).
 
 ## Joint Distributions
 
@@ -152,7 +152,7 @@ Let $Y$ be a random variable for the throw of a die with equal chances to every 
 It is quite easy to obtain the joint pdf of $X$ and $Y$ if they are independent. $X$ and $Y$ are independent if: $$f_{X,Y}(x,y) = f_X(x)f_Y(y)$$ In other words, they are independent if the die side thrown does not depend on the color of the die. In the discrete case, it is the same as $$P(X=x, Y=y) = P(X=x)P(Y=y)\text{,}$$ that is, the probability that the die is read and you throw a 6 is the product of the probability of throwing a 6 and of the die being red. Since we know these probabilities, we can calculate: $\frac{1}{2} \times \frac{1}{6} = \frac{1}{12}$.
 
 ### The continuous case
-By taking the integral of a joint pdf of continous variables, we can get the probability that X and Y fall in a certain interval: $$P(a \leq X \leq b, c \leq Y \leq d) = \int_a^b \int_c^df_{X,Y}(x,y)dydx$$
+By taking the integral of a joint pdf of continous variables, we can get the probability that $X$ and $Y$ fall in a certain interval: $$P(a \leq X \leq b, c \leq Y \leq d) = \int_a^b \int_c^df_{X,Y}(x,y)dydx$$
 If you have any given functions, it is quite easy (as with the normal distribution) and can be done by hand (might in some cases be easier than doing it with r). A continuous joint pdf could look like this ($X$ = height, $Y$ = weight; this is a bad example because obviously weight is dependent from height).
 ```{r warning=FALSE, message=FALSE, fig.height=4, fig.width=9}
 library(MASS)
