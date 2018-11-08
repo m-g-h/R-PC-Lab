@@ -1,0 +1,226 @@
+---
+title: "Random Variables"
+output:
+  ioslides_presentation:
+    widescreen: yes
+  slidy_presentation: default
+  beamer_presentation:
+    theme: metropolis
+---
+
+```{r setup, include=FALSE }
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(fig.height=4)
+knitr::opts_chunk$set(fig.width=10)
+```
+## Contents and Goals
+
+- Know what a random variable is
+    - Discrete / Continuous
+    - Probability Density Functions and Cumulative Density Functions
+    - Joint and Conditional Distributions
+
+## Random Variables
+ - Variables that take on numerical values and are determined by experiments.
+ - Probability Experiments (trials): procedures which can be infinitely repeated and which have a well-defined set of possible outcomes. These outcomes are affected by chance.
+- Coin toss experiment: Outcomes are well defined by $\{heads, tails\}$ which we we can assign (recode) to $\{0,1\}$ meaning "no heads" and "heads". The variable for the outcome will be denoted by $X$. Now, unless we perform a cointoss, the value $X$ takes on remains essentially *random*.
+
+## A few notational remarks
+Consider the vector $X_i = (X_1 , X_2, \dots, X_{100})$ which contains the results from a fair coinflip. Using the `rbinom` function we simulate `n = 100` cointosses and obtain a vector of results $x_i = (x_1, x_2, \dots, x_{100})$ :
+
+```{r}
+X <- rbinom(n = 100, size = 1, prob = 0.5)
+
+print(X)
+
+```
+ 
+If we would additionally conduct another experiment where we count two successive coin tosses (`size = 2`), we would obtain a second random variable, which we would denote by $Y_i$ and $y_i$ respectively.
+
+## A few notational remarks
+
+**Notation:**
+
+- Use **capital letters** such as $O$ or $P$ to denote a **random variable**
+- Use **small letters** such as $m$ or $n$ to denote **particual outcomes** of $M$ and $N$
+- Use **subscripts** (e.g. $a_i$) to distinct **different outcomes** of the random variable $A_i$.
+
+
+## Discrete random variables
+ - Variables which can only take a countable number of values.
+ - For cointoss example: $X$ is a random variable with $j = 2$ outcomes, $\{0, 1\}$ (no head, head). Then the probability of each outcome is:
+
+$$p_j = P(X = x_j), \; j = 1, 2 \qquad \text{with } p_1 + p_2 = 1$$
+
+ - Random variables which can only take on two values are called **Bernoulli random variables**
+
+## Example:drawing a card and predicting its symbol 
+
+- Denote the random variable for the card draw by $C$
+- We have $j = 4$ possible outcomes for $C$, $\{hearts, spades, clubs, diamonds\}$
+- The probabilities are denoted as: $p_j = P(C = c_j), \; j= 1, 2, \dots , 4$
+- Since we know that each symbol is represented equally in the deck, $p_j = 0.25$ for all $j$.
+- The probability to draw a joker is $0$ since the sample space only includes the four symbols.
+- Likewise, the probability to draw any of the four symbol is $1$ ($100%$).
+
+## Continuous random variables
+ - Take on any real value with probability zero
+ - Example: height of a person. Usually ranges between $45cm$ and $272cm$.
+ - No person with negative heights
+ - Within range: infinity of exact values that a person's height can take on: $182,6732467cm$ is taller than $182,6732466cm$).
+
+# Probability Density Functions and Cumulative Density Functions
+
+## Discrete random variables
+ - For discrete random variables, the probability density function (pdf), or, the probability mass function (pmf) summarises information about outcomes of $X$ and its probabilities. 
+ - Definition: $$f_X(x) = P(X=x)$$ 
+ 
+## Discrete random variables
+
+ For the card example: 
+```{r warning=FALSE, fig.height=4, fig.width=9}
+library(ggplot2)
+
+p <- rep(0.25,4)
+symbols <- factor(c(0,1,2,3), labels=c("Hearts","Spades",
+                                         "Clubs", "Diamonds"))
+df = data.frame(p, symbols)
+ggplot(df, aes(symbols,p, fill=symbols)) + 
+  geom_bar(stat="identity",width = 0.05) +
+  scale_y_continuous(limits=c(0,1)) + labs(y="f(x)", x="Symbols") +
+  scale_fill_manual("legend",
+                    values = c("Hearts" = "red", "Spades" = "black",
+                               "Clubs" = "black", "Diamonds" = "red")) + 
+  guides(fill=F) + theme_minimal()
+```
+
+ - Easy to calculate event probabilities
+ - Example: $$\begin{aligned}&P(X=\text{Hearts or } X=\text{Clubs})\\&=P(X=\text{Hearts}) + P(X=\text{Clubs})\\&=0.25 + 0.25 = 0.5\end{aligned}$$  
+ 
+---
+
+- This can also be calculated with the cumulative density function (cdf)
+- The cdf cumulates the probabilities of the single possible outcomes and is defined as $$F(x) = \sum_{X\leq x}f_X(x)=P(X\leq x)$$ 
+```{r warning=FALSE, fig.height=4, fig.width=9}
+df$xend <- c(df$symbols[2:nrow(df)], 5)
+df$yend <- cumsum(df$p)
+ggplot(df, aes(as.numeric(symbols), cumsum(p), xend=xend, yend=yend, color=symbols)) +
+      #geom_vline(aes(xintercept=as.numeric(symbols)), linetype=2, color="grey") +
+      geom_point() +
+      geom_point(aes(x=xend, y=cumsum(p)), shape=1) + 
+      geom_segment() +
+      scale_color_manual("legend",
+                    values = c("Hearts" = "red", "Spades" = "black",
+                               "Clubs" = "black", "Diamonds" = "red")) +
+      scale_x_continuous(breaks = 1:5, 
+                         labels = c("Hearts", "Spades",
+                                    "Clubs", "Diamonds", "")) +
+      guides(color=F) + labs(x="Symbols", y="Probability") +
+      theme_minimal()
+
+```
+
+## Continuous random variables
+
+- Not very meaningful to think about single outcome probabilities as with discrete random variables
+- PDF of continuous random variables is used to calculate events concerning a range of values. This is done by taking the integral of this range. Generally: $$F_X(x) = \int f_X(x) dx$$
+
+## Continuous random variables
+
+- In the height example: How probable is it for a person to be between $170cm$ and $180cm$ tall, $P(170\leq X \leq 180)$?
+```{r warning=FALSE, fig.height=4, fig.width=9}
+height = rnorm(10000, mean=177, sd=30)
+df = data.frame(height)
+
+dp <- ggplot(df, aes(height)) + geom_density(size=1) + 
+  geom_vline(aes(xintercept=mean(height)), color="red", linetype="dashed",
+                 size=1)
+dpb <- ggplot_build(dp)
+x1 <- min(which(dpb$data[[1]]$x >=170))
+x2 <- max(which(dpb$data[[1]]$x <=180))
+dp + geom_area(data=data.frame(x=dpb$data[[1]]$x[x1:x2],
+                               y=dpb$data[[1]]$y[x1:x2]),
+               aes(x=x, y=y), fill="blue", alpha=0.1) +
+    theme_minimal() + 
+    theme(axis.title.y=element_blank(),
+          axis.text.y=element_blank()) + labs(x="Height")
+```
+
+## Continuous random variables
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(sfsmisc)
+height = rnorm(10000, mean=177, sd=30)
+df = data.frame(height)
+dens = density(df$height)
+integrate.xy(dens$x, dens$y,170,180)
+```
+ - $P(170\leq X \leq 180) \approx 0.13 = 13\%$ (the integrate.xy function is not exact).
+
+## Continuous random variables
+
+The CDF always provides us with the probability of the variable to take on a value *up to* $x$, that is, $P(X \leq x)$. 
+ - Definition: $$F_X(x)=\int_{-\infty}^xf_X(x)dx$$
+ - At all points its value is the total area under the curve of the pdf up to $x$.
+ 
+## Continuous random variables
+
+
+```{r warning=FALSE, fig.height=4, fig.width=9}
+df_int = data.frame(height=dens$x, y=cumsum(dens$y)/2)
+ggplot(df_int, aes(height,y)) + geom_line(size=1) + 
+  geom_vline(aes(xintercept=mean(height)), color="red", linetype="dashed",
+                 size=1) +
+  scale_x_continuous(breaks=seq(50,300,50)) + 
+  scale_y_continuous(breaks=seq(0,1,0.2)) +
+  theme_minimal() + labs(x="Height", y="F(x)")
+```
+
+ - Example: $P(X\leq 150) \approx 0.2$. 
+ - For the requirements and attributes of probability density functions and cumulative density functions, please refer to the course slides.
+
+# Joint Distributions and Conditional Distributions
+
+---
+
+ - Need for considering $>1$ variables in applied econometrics.
+ - Example: Probability that a person is between $170cm$ and $180cm$ tall *and* weighs between $60kg$ and $90kg$
+ - Or: Probability of getting a $6$ with one throw of a die given the die is red instead of blue.
+
+## Joint Distributions
+
+ - The discrete case
+ - $Y$ is a random variable for the throw of a die with equal chances to every side
+ - $X$ is a random variable for the color (blue, red) of the die. 
+ - Throwing a random die leads to the joint probability density function of $(X,Y)$: $$f_{X,Y}(x,y) = P(X=x, Y=y)$$.
+
+ - Easy to obtain joint pdf if $X$ and $Y$ independent.
+ - Independence of $X$ and $Y$ if: $$f_{X,Y}(x,y) = f_X(x)f_Y(y)$$ 
+    - I,e., they are independent if the die side thrown does not depend on the color of the die.
+ - In the discrete case, it is the same as $$P(X=x, Y=y) = P(X=x)P(Y=y)\text{,}$$ 
+ - That means that the probability that the die is read and you throw a 6 is the product of the probability of throwing a 6 and of the die being red. Since we know these probabilities, we can calculate: $\frac{1}{2} \times \frac{1}{6} = \frac{1}{12}$.
+
+### The continuous case
+ - Taking the integral of a joint pdf of continous variables leads us to get the probability that $X$ and $Y$ fall in a certain interval
+ - Definition: 
+ 
+$$P(a \leq X \leq b, c \leq Y \leq d) = \int_a^b \int_c^df_{X,Y}(x,y)dydx$$
+
+ - A joint pdf of continuous variables might look like this
+ - ADD JOOINT DISTRIBUTION TODO
+
+## Conditional Distributions
+ - Contain probabilities of an outcome given another specific outcome was observed (conditional distribution of $Y$ given $X$)
+ - **conditional probability density function**: $$\frac{f_{Y|X}(y|x)}{f_X(x)}$$
+ - For the discrete case follows: $$f_{X|Y}(y|x) = P(Y=y|X=x)$$
+ - When $X$ and $Y$ are independent, it follows from $f_{X,Y}(x,y) = f_X(x)f_Y(y)$ that $$f_{X|Y}(y|x) = f_Y(y)\text{.}$$
+
+## Conditional Distributions
+
+
+ - Die example ($Y$ being the colour, $X$ the number)
+    - If die is blue, $P(6) = .8$
+    - If die is red, equal chances for all sides
+ - $$\begin{aligned}f_{Y|X}(6|\text{blue})&=.80\\f_{Y|X}(6|\text{red})&=\frac{1}{6}\end{aligned}$$
+ - We can also calculate $P(X=\text{blue}, Y=6)$ if we know $P(X=\text{blue}$. If the probability of getting the blue die is $60%$, then $$P(X=\text{blue}, Y=6) = P(Y=6|X=\text{blue})\times P(X=\text{blue}) = .80 \times .60 = .48 = 48%$$
+

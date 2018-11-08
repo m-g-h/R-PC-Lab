@@ -77,9 +77,9 @@ inc_2 <- rnorm(n, mean = 1000, sd = 200)
 
 ```{r}
 ggplot() +
-  geom_histogram(aes(x = inc_2,
+  geom_histogram(aes(x = inc,
                      y = ..density..), binwidth = 60, alpha = 0.8) +
-  geom_density(aes(x = inc_2,
+  geom_density(aes(x = inc,
                    y = ..density..), col = "red", size = 2, alpha = 0.8) +
   labs(title = "Income of ZU Students") +
   theme_minimal()
@@ -245,7 +245,7 @@ This is our p-value. It tells us that we can reject the $H_0$ at most at a signi
 ## Excercises 2
 
 1. Use the inbuilt  `t.test()` for the hypothesis test and compare the results
-    - specify `x`, `alternative` and `mu`in the function call
+    - specify `x`, `alternative` and `mu` in the function call
     
 2. Test the hypothesis that the cars in `mtcars` are not very fuel efficient
     - Load the inbuilt dataset with `mtcars`
@@ -253,4 +253,4 @@ This is our p-value. It tells us that we can reject the $H_0$ at most at a signi
     
 3. Test the hypothesis that in $1888$ more than $40\%$ of the swiss male population were working in agriculture
     - use the inbuild `swiss` dataset
-    - use the $ 1\%$ significance level
+    - use the $1\%$ significance level

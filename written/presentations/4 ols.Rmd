@@ -1,0 +1,141 @@
+---
+title: "Simple Linear Regression and OLS"
+output:
+  ioslides_presentation:
+    widescreen: yes
+  beamer_presentation:
+    theme: metropolis
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE }
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(fig.height=4)
+knitr::opts_chunk$set(fig.width=10)
+```
+
+## Contents and Goals
+
+- Get to know the basic features of probability distributions
+    - Mean / Expected Value
+    - Variance and Standard Deviation
+    - Covariance and Correlation
+    - Standardisation
+- Learn how they work
+- Learn how we can manipulate them
+
+## Linear Regression
+ - Predict one variable from another: One simple way to do so is using linear regression (SLR)
+ - SLR is about predicting a dependent variable (*regressand*) from one independent variable (*regressor*). 
+ - A SLR model is given by: $$y = \beta_0 + \beta_1x + \epsilon$$
+where $y$ is the regressand and $x$ the regressor. $\epsilon$ denotes the error of the model, i.e. the residuals. Regression is often used to model real-world relationships.
+ - Note: Nothing else than any linear function $y=mx+b$. 
+    - In regression, $\beta_0$ is $b$, and $\beta_1$ is $m$, the slope. 
+ - The regression line is the one line that crosses or passes the observation with the smallest amount of squared error.
+ 
+---
+
+```{r echo = FALSE}
+library(ggplot2)
+student_id = c(1,2,3,4,5)
+x = c(95,85,80,73,70,65,60,58,55,51)
+y = c(85,95,75,70,65,70,62,53,52,51)
+grades_df = data.frame(student_id, x, y)
+ggplot(grades_df, aes(x, y)) + 
+  geom_point() + labs(x="Statistics Grade", y="Econometrics Grade") + geom_smooth(
+    method="lm", colour="red", se=T, alpha=0.1) + theme_minimal()
+```
+ - Line does not cross a single data point, but it minimises the squared deviations of all the single points from the line. 
+ - Deviations are called "residuals" and in a linear regression model, they sum up to zero.
+ - Looking at the residuals: 
+```{r}
+resid = summary(lm(y~x, data=grades_df))$residuals; resid
+round(sum(resid))
+```
+ - Graph: The rightmost point deviates by $-7.03$, the second by $12.36$, etc.
+ - Researchers are interested in the amount of change in $y$ that occur when $x$ changes. 
+    - As in any linear function, the rate of change is given by $\beta_1$. More formally: $$\frac{\delta y}{\delta x} = \beta_1$$
+
+## Interpretation by example
+ - In the example, we have ten students who took exams in Statistics and exams in Econometrics. We know their grades in Statistics. Now, we would like to predict the Econometrics grade of any other student who took the Statistics exam. 
+ - Model:
+
+$$\hat{econgrade} = \hat{\beta_0} + \hat{\beta_1}statsgrade + \hat{\epsilon}$$
+ - The hats $\hat{}$ are used because we look at empirical data, and we can only *estimate* a model, but not claim that we have an image of the theoretical model here
+
+---
+
+```{r fig.height=4, fig.width=9}
+library(ggplot2)
+student_id = c(1,2,3,4,5)
+x = c(95,85,80,73,70,65,60,58,55,51)
+y = c(85,95,75,70,65,70,62,53,52,51)
+grades_df = data.frame(student_id, x, y)
+ggplot(grades_df, aes(x, y)) + 
+  geom_point() + labs(x="Statistics Grade", y="Econometrics Grade") + geom_smooth(
+    method="lm", colour="red", se=T, alpha=0.1) + theme_minimal()
+```
+
+```{r echo = TRUE}
+summary(lm(y~x, data=grades_df))$coefficients
+```
+ - Clear linear relationship between the students' statistics grades and the econometrics grades. 
+ - By how much does a student's Econometrics grade increase if the student's Statistics grade was better by one? 
+```{r echo = TRUE}
+summary(lm(y~x, data=grades_df))$coefficients
+```
+ - Estimate column, first row: $2.82$ = *intercept* of the line with the y-axis. 
+    - Interpretation (not always meaningful): If a student scored zero points in his statistics exam, he will score $2.82$ on the Econometrics exam. 
+ - Estimate column, second row: $\hat{\beta_1} = 0.94$ = Estimate of the beta coefficient for our $x$, which is the Statistics grade.
+    - "Ceteris paribus (with all else being equal), an increase of $1$ of the Statistics grade implies an increase of $0.94$ of the Econometrics grade.". 
+ - Statistical significance?: $p$-value is below common standards ($0.0002$), so we would reject our null hypothesis (which was that the estimate equal to zero) and say that our beta coefficient is statistically significant. 
+    -- This basically means that we can believe that a better Statistics grade really implies a better Econometrics grade.
+
+---
+
+ - Essential problem with this interpretation: Do we have a causal relationship or just a correlation? Do we know that the line we drew is the best guess for a prediction?
+
+## Ordinary least squares
+ -  Regression line = line that fits our points so that it minimises the squared deviations (residuals) of the points from the line. 
+ - To construct such a line, we need to know the intercept and the slope coefficient(s) for $x$. The formulas are quite simple: 
+ 
+$$\begin{aligned}\hat{\beta_1}&=\frac{Cov[x,y]}{Var[x]}\\\hat{\beta_0}&=\bar{y} - \hat{\beta_1}\bar{x}\text{.}\end{aligned}$$
+ - Proof by a formal minimization problem, we want to minimize $\hat{\epsilon}^2$.
+---
+
+$$\min\limits_{\hat{\beta_0},\hat{\beta_1}}\sum_{i=1}^n\hat{u}_i^2 = \sum_{i=1}^n(y_i-\hat{\beta}_0-\hat{\beta}_1x_1)^2$$
+
+ - Minimise by taking the first order conditions (FOCs) by $\hat{\beta_0}$ and $\hat{\beta_1}$. The first FOCs is (as derived by $\hat{\beta_0}$: 
+ 
+$$\begin{aligned}
+&2\times\sum_{i=1}^n(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0 \text{ | :2} \\
+\iff & \sum_{i=1}^n(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0\\
+\iff & \sum_{i=1}^n(y_i)-\sum_{i=1}^n(\hat{\beta}_0)-\sum_{i=1}^n(\hat{\beta}_1x_i)\stackrel{!}{=}0\\
+\iff & \sum_{i=1}^n(y_i)-n\times\hat{\beta}_0-\sum_{i=1}^n(\hat{\beta}_1x_i)\stackrel{!}{=}0\text{ | } :n\\
+\iff & \bar{y}-\hat{\beta_0}-\hat{\beta_1}\bar{x}\stackrel{!}{=}0\\
+\iff & \hat{\beta_0} = \bar{y} - \hat{\beta_1}\bar{x}
+\end{aligned}$$ 
+
+--- 
+- Now derive by $\hat{\beta_1}$: 
+
+$$\begin{aligned}&2\times\sum_{i=1}^n-x_i(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0\text{ | :(-2)} \\
+\iff & \sum_{i=1}^nx_i(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0\\
+\iff & \sum_{i=1}^nx_i(y_i-(\bar{y}-\hat{\beta_1}\bar{x})-\hat{\beta}_1x_i) \stackrel{!}{=} 0\\
+\iff & \sum_{i=1}^nx_i(y_i-\bar{y})+\sum_{i=1}^nx_i(-\hat{\beta_1}\bar{x}-\hat{\beta_1}x_i) \stackrel{!}{=} 0\\
+\iff & \sum_{i=1}^nx_i(y_i-\bar{y})-\hat{\beta_1}\sum_{i=1}^nx_i(x_i-\bar{x}) \stackrel{!}{=} 0\\
+\iff & \sum_{i=1}^nx_i(y_i-\bar{y})=\hat{\beta_1}\sum_{i=1}^nx_i(x_i-\bar{x}) \text{ | counterintuitive but possible:}\\
+\iff & \sum_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})=\hat{\beta_1}\sum_{i=1}^n(x_i-\bar{x})^2\\
+\iff & \hat{\beta_1} = \frac{\sum_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^n(x_i-\bar{x})^2} = \frac{Cov[x,y]}{Var[x]}
+\end{aligned}$$
+
+## Assumptions
+
+Before interpreting SLR models, one should be aware of its assumptions, namely:
+1. The population model is linear in its parameters: $y = \beta_0 + \beta_1x + \epsilon$
+2. The sample at hand is a random sample from the population model.  
+3. There is variation in the $x_i$: $\sum_{i=1}^n (x_i - \bar{x})^2 > 0$
+4. $\mathbb{E} \left[\epsilon|x\right] = 0$ and therefore $\mathbb{E} \left[\epsilon_i|x_i\right] = 0$
+5. Homoskedasticity (Equality of variances) is given: $Var\left[\epsilon|x\right] = Var\left[\epsilon_i|x_i\right] = \sigma^2$
+
+Note that this only holds as long as the the assumption of independence is met, i.e. $\frac{\delta \epsilon}{\delta x} = 0$

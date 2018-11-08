@@ -15,6 +15,20 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Features of Probability Distributions
 
+## Contents and Goals
+
+- Get to know the basic features of probability distributions
+    - Mean / Expected Value
+    - Variance and Standard Deviation
+    - Covariance and Correlation
+    - Standardisation
+- Learn how they work
+- Learn how we can manipulate them
+
+These features are the **building blocks of statistics**. Understanding how they work helps us to understand theoretical proofs.
+
+They are useful to understand the concepts of (not exclusively) **Estimation**, **Hypothesis Tests** and **Regression**
+
 ## Central Tendency: The Expected Value
 
 The most commonly used feature of a probability distribution is the *expected value*. It splits the probability under the *pdf* in half.
@@ -69,17 +83,17 @@ The central tendendcy tells us, around which value the outcomes of the random va
 
 You can see this notion of *distance from the mean* in the definition of the variance:
 
-$$ Var[X] = \mathbb{E} \left[ \left( X - \mathbb{E} [X] \right) ^2  \right] $$
+$$ Var[X] = \mathbb{E} \left[ \left( X - \mu_X \right) ^2  \right] $$
 
 The deviation from the expected value $(X - \mathbb{E}[X])$ is squared in order to prevent perfect cancellation of deviations, since:
-$$\mathbb{E} \left[(X - \mathbb{E}[X]) \right] = \mathbb{E}[X] - \mathbb{E}[X] = 0$$
+$$\mathbb{E} \left[(X - \mu_X) \right] = \mathbb{E}[X] - \mu_X = 0$$
 
 ### Useful Rules for Variances
 
 For any constants $a$ and $b$ and a random variable $X$, the following rules apply:
 
-- Alternative representation
-$$ Var[X] = \mathbb{E} \left[ X^2 \right] - \mathbb{E}[X]^2 $$
+- Alternative representation (see below for proof):
+$$ Var[X] = \mathbb{E} \left[ X^2 \right] - \mu_X^2 $$
 - Variance of a constant is zero:
 $$ Var[c] = 0 $$
 - Variance of a linear combination:
@@ -94,7 +108,7 @@ For any constants $a$ and $b$ and a random variable $X$, it has the following us
 - Standard deviation of a linear combination:
 $$ sd[a X + b] = |a| sd[X] $$
 
-- The variance of a sum of random variables is the sum of the evariance, given independence:
+- The variance of a sum of random variables is the sum of the evariance, **given independence**:
 $$ Var\left[ \sum_{i=1}^n X_i \right] = \sum_{i=1}^n Var[X_i] = \sum_{i=1}^n Var[X_i] $$
 
 - The standard deviation is often denoted by $\sigma$ or $\sigma_X$ instead of $sd[X]$.
@@ -163,7 +177,7 @@ $$ Cov[X,Y] = \mathbb{E} \left[ (X - \mathbb{E}[X]) (Y - \mathbb{E}{Y} ) \right]
 
 For any constants $a$ and $b$ and random variables $X$, and $Y$ the following rules apply:
 
-- Alternative representations:
+- Alternative representations (see below for proof):
 $$ \begin{aligned}
 Cov[X,Y] &= \mathbb{E}[XY] - \mathbb{E}[X] \mathbb{E}[Y] \\
 &= \mathbb{E}[(X -\mathbb{E}[X])Y] \\
@@ -191,3 +205,34 @@ The variance and standard deviation are both dependent on their units of measure
 $$  Corr[X,Y] = \frac{Cov[X,Y]}{sd[X] sd[Y]} = \frac{\sigma_{XY}}{\sigma_X \sigma_Y}$$
 
 - The population correlation coefficient is usually denoted as $\rho$ or $\rho_{XY}$ instead of $Corr[X,Y]$
+
+# Proofs
+
+**Proof for the alternative representation of the Variance**
+
+$$ \begin{aligned}  Var[X] &= \mathbb{E} \left[ \left( X - \mu_X \right) ^2  \right] \\
+&= \mathbb{E} \left[ X^2 - 2X\mu_X + \mu_X^2 \right] \\
+&= \mathbb{E} \left[ X^2 \right] - \mathbb{E} \left[ 2X\mu_X \right] + \mathbb{E}\left[ \mu_X^2 \right] \\
+&= \mathbb{E} \left[ X^2 \right] - 2 \mu_X \mu_X + \mu_X^2 \\
+&= \mathbb{E} \left[ X^2 \right] - 2 \mu_X^2 + \mu_X^2 \\
+&= \mathbb{E} \left[ X^2 \right] - \mu_X^2
+\end{aligned}$$
+
+**Proof for the alternative representation of the covariance**
+$$ \begin{aligned}  Cov[X,Y] &= \mathbb{E} [ (X - \mu_X) (Y - \mu_Y) ] \\
+&= \mathbb{E} [ XY - X \mu_Y - Y \mu_X + \mu_X \mu_Y ] \\
+&= \mathbb{E} [ XY ] - \mathbb{E} [X \mu_Y] - \mathbb{E} [Y \mu_X] + \mathbb{E}[\mu_X \mu_Y] \\
+&= \mathbb{E} [ XY ] - \mu_Y \mathbb{E}[X]  - \mu_X \mathbb{E}[Y] + \mu_X \mu_Y \\
+&= \mathbb{E} [ XY ] - \mu_Y \mu_X - \mu_X \mu_Y + \mu_X \mu_Y \\
+&= \mathbb{E} [ XY ] - \mu_X \mu_Y
+\end{aligned}$$
+
+**Proof for the second alternative representation of the covariance**
+$$ \begin{aligned}
+Cov[X,Y] &= \mathbb{E}[XY] -\mu_X \mu_Y \\
+&= \mathbb{E}[XY] - \mu_X\mathbb{E}[Y] \\
+&= \mathbb{E}[XY] - \mathbb{E}[\mu_XY] \\
+&= \mathbb{E}[ XY - \mu_X Y] \\
+&= \mathbb{E} [(X - \mu_X) Y]
+\end{aligned}
+$$
