@@ -202,7 +202,10 @@ ggplot(df_int, aes(height,y)) + geom_line(size=1) +
 
 ### The continuous case
  - Taking the integral of a joint pdf of continous variables leads us to get the probability that $X$ and $Y$ fall in a certain interval
- - Definition: $$P(a \leq X \leq b, c \leq Y \leq d) = \int_a^b \int_c^df_{X,Y}(x,y)dydx$$
+ - Definition: 
+ 
+$$P(a \leq X \leq b, c \leq Y \leq d) = \int_a^b \int_c^df_{X,Y}(x,y)dydx$$
+
  - A joint pdf of continuous variables might look like this
  - ADD JOOINT DISTRIBUTION TODO
 
