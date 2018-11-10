@@ -106,12 +106,18 @@ summary(lm(y~x, data=grades_df))$coefficients
 
 ## Ordinary least squares
  -  Regression line = line that fits our points so that it minimises the squared deviations (residuals) of the points from the line. 
- - To construct such a line, we need to know the intercept and the slope coefficient(s) for $x$. The formulas are quite simple: $$\begin{align}\hat{\beta_1}&=\frac{Cov[x,y]}{Var[x]}\\\hat{\beta_0}&=\bar{y} - \hat{\beta_1}\bar{x}\text{.}\end{align}$$
+ - To construct such a line, we need to know the intercept and the slope coefficient(s) for $x$. The formulas are quite simple: 
+ 
+$$\begin{aligned}\hat{\beta_1}&=\frac{Cov[x,y]}{Var[x]}\\\hat{\beta_0}&=\bar{y} - \hat{\beta_1}\bar{x}\text{.}\end{aligned}$$
  - Proof by a formal minimization problem, we want to minimize $\hat{\epsilon}^2$.
---- 
+---
+
 $$\min\limits_{\hat{\beta_0},\hat{\beta_1}}\sum_{i=1}^n\hat{u}_i^2 = \sum_{i=1}^n(y_i-\hat{\beta}_0-\hat{\beta}_1x_1)^2$$
 
- - Minimise by taking the first order conditions (FOCs) by $\hat{\beta_0}$ and $\hat{\beta_1}$. The first FOCs is (as derived by $\hat{\beta_0}$: $$\begin{aligned}&2\times\sum_{i=1}^n(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0 \text{ | :2} \\
+ - Minimise by taking the first order conditions (FOCs) by $\hat{\beta_0}$ and $\hat{\beta_1}$. The first FOCs is (as derived by $\hat{\beta_0}$: 
+ 
+$$\begin{aligned}
+&2\times\sum_{i=1}^n(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0 \text{ | :2} \\
 \iff & \sum_{i=1}^n(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0\\
 \iff & \sum_{i=1}^n(y_i)-\sum_{i=1}^n(\hat{\beta}_0)-\sum_{i=1}^n(\hat{\beta}_1x_i)\stackrel{!}{=}0\\
 \iff & \sum_{i=1}^n(y_i)-n\times\hat{\beta}_0-\sum_{i=1}^n(\hat{\beta}_1x_i)\stackrel{!}{=}0\text{ | } :n\\
@@ -121,6 +127,7 @@ $$\min\limits_{\hat{\beta_0},\hat{\beta_1}}\sum_{i=1}^n\hat{u}_i^2 = \sum_{i=1}^
 
 --- 
 - Now derive by $\hat{\beta_1}$: 
+
 $$\begin{aligned}&2\times\sum_{i=1}^n-x_i(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0\text{ | :(-2)} \\
 \iff & \sum_{i=1}^nx_i(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \stackrel{!}{=} 0\\
 \iff & \sum_{i=1}^nx_i(y_i-(\bar{y}-\hat{\beta_1}\bar{x})-\hat{\beta}_1x_i) \stackrel{!}{=} 0\\
@@ -155,10 +162,10 @@ $$\begin{aligned}\mathbb{E}\left[y|x\right] &= \mathbb{E}\left[\beta_0 + \beta_1
 ## Assumptions
 
 Before interpreting SLR models, one should be aware of its assumptions, namely:
-1. The population model is linear in its parameters: $$y = \beta_0 + \beta_1x + \epsilon$$
+1. The population model is linear in its parameters: $y = \beta_0 + \beta_1x + \epsilon$
 2. The sample at hand is a random sample from the population model.  
-3. There is variation in the $x_i$: $$\sum_{i=1}^n (x_i - \bar{x})^2 > 0$$
+3. There is variation in the $x_i$: $\sum_{i=1}^n (x_i - \bar{x})^2 > 0$
 4. $\mathbb{E} \left[\epsilon|x\right] = 0$ and therefore $\mathbb{E} \left[\epsilon_i|x_i\right] = 0$
-5. Homoskedasticity (Equality of variances) is given: $$Var\left[\epsilon|x\right] = Var\left[\epsilon_i|x_i\right] = \sigma^2$$
+5. Homoskedasticity (Equality of variances) is given: $Var\left[\epsilon|x\right] = Var\left[\epsilon_i|x_i\right] = \sigma^2$
 
 Note that this only holds as long as the the assumption of independence is met, i.e. $\frac{\delta \epsilon}{\delta x} = 0$

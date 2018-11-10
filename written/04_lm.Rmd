@@ -1,0 +1,107 @@
+---
+title: "Linear Modelling"
+output:
+  ioslides_presentation:
+    widescreen: yes
+    slide_level: 2
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: no
+---
+
+```{r echo = F}
+knitr::opts_chunk$set(echo = F)
+```
+
+# Introduction
+
+## The `lm` Function
+
+```{r eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE}
+lm(formula,
+   data,
+   subset,
+   na.action)
+```
+
+`formula` - Specification of our regression model
+
+`data` - The dataset containing the variables of the regression
+
+`subset` - An option to subset the data 
+
+`na.action` - Option that specifies how to deal with missing values
+
+The `formula` Argument
+---
+
+- Behind the scenes, OLS-estimation is linear algebra. E.g. The linear regression parameters are derived by $\boldsymbol{\beta} = \boldsymbol{(X'X)^{-1}X'y}$ 
+- In order to keep our interaction with R short and simple (and without linear algebra), R offers the *formula method*
+
+We can write our models using the following syntax:
+
+```{r echo=TRUE, eval=FALSE}
+response ~ model
+```
+
+Where `response` is just our dependent variable / response  usually denoted by $y$ and `model` is our formula of independent variables / regressors, e.g.:
+
+```{r echo=TRUE, eval=FALSE}
+happiness ~ age + income + n_children + married
+```
+
+---
+
+We can construct formulas with the following syntax:
+
+
+- Adding variables: `a + b`
+
+- Interactions: `a : b`
+
+- Crossing: `a * b ` is equivalent to `a + b + a:b`
+
+- Transformations:
+    - To square a variable, use `I(a^2)`, not `a^2`
+    - Use `log(a)` for a log transformation
+    
+- Include all variables in your data with `.`
+
+
+
+The `subset` Argument
+---
+
+- Sometimes, we want to run our model on a subset of our data
+- We can specify subsets of certain variables as follows:
+
+```{r echo=TRUE, eval=FALSE}
+lm(formula,
+   data,
+   subset = age < 30)
+```
+
+- Connect muliple subset arguments with logical operators:
+
+```{r echo=TRUE, eval=FALSE}
+lm(formula,
+   data,
+   subset = age < 30 & height > 180)
+```
+
+Note that although this works, a best-practice is to subset your data prior to the estimation. By keeping these steps distinct, your code will be much easier for someone else to understand.
+
+The `na.action` Argument
+---
+
+If the data contains missing values, `lm` automatically deletes the whole observation.
+
+- Specify `na.action = na.fail` if you want an error when the data contains missing values
+
+Again, it is a best-practice to look for missing values in your data prior to the estimation to keep your code transparent.
+
+- You can use the `missmap` function from the `Amelia` package to get a nice visualisation of missing values in your data
+
+
+

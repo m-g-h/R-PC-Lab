@@ -9,16 +9,25 @@ output:
     toc: yes
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE }
+knitr::opts_chunk$set(fig.height=4)
+knitr::opts_chunk$set(fig.width=10)
 ```
 
 
-# Introduction
+# Contents
 
-This section covers a fundamental part of inference: hypothesis testing. Tests of hypotheses are frequently applied in econometrics, e.g. t-tests for OLS parameters or in tests for heteroscedasticity.
+This section covers a fundamental part of inference: hypothesis testing. 
 
-We use hypothesis testing, because we don't much about our populations, just from a sample.
+Tests of hypotheses are frequently applied in econometrics, e.g. t-tests for OLS parameters or in tests for heteroscedasticity.
+
+In this section we will:
+
+- Take a look at the general hypothesis testing procedure
+- Derive hypothesis testing with a simulation
+- Learn how to do hypothesis testing in R
+
+In the previous part I assumed that we know the population. Actually -- in practice -- we don't. We use hypothesis testing because we don't much about our populations.
 
 **We actually don't know**:
 
@@ -28,35 +37,39 @@ We use hypothesis testing, because we don't much about our populations, just fro
 
 In this scenario (which is the realistic scenario) we do the following:
 
-**Assume the population distribution and a value for our parameter of interest. Then estimate the unknown parameters from a sample and test if our assumptions are reasonable.**
+1. **Assume the population distribution and a value for our parameter of interest**
+2. **Then estimate the unknown parameters from a sample**
+3. **Test if our assumptions are reasonable**
 
-This procedure is called hypothesis testing
+# Formal Hypothesis Testing Procedure
 
-Assume that the distribution of the population is normal (e.g. because it is reasonably from theory)#
+Assume that the distribution of the population is normal (e.g. because it is reasonably from theory)
 
-1. Formulate a hypothesis about our population mean (e.g. $H_0:\mu_X = 1000$)
-2. Estimate the mean with the arithmetic mean $\bar{X}$
+1. Formulate a hypothesis about our population parameter (e.g. $H_0:\mu_X = 1000$)
+    1.1 Also the alternative hypothesis $H_1: \mu_X \neq 1000$
+2. Estimate the parameter
+    - In this case with the arithmetic mean $\bar{X}$
 3. Estimate the variance and derive the sample standard deviation $S_X$
 4. Standardise $\bar{X}$ using our estimated $S_X$ and the assumed $\mu_X$
 5. Calculate the probability that our observed $\bar{X}$ is from the population, given a specific level of certainty (e.g. $95 \%$)
 
 
-## Simulated Population
+# Simulated Population
 
 We take again our sample from a simulated population of ZU student income:
 
-```{r fig.height=4, fig.width=9, message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 library(ggplot2)
 library(tidyverse)
 set.seed(11) # seed for reproducibility
 
 n <- 1200
-inc_2 <- rnorm(n, mean = 1000, sd = 200)
+inc <- rnorm(n, mean = 1000, sd = 200)
 
 ggplot() +
-geom_histogram(aes(x = inc_2,
+geom_histogram(aes(x = inc,
 y = ..density..),binwidth = 60,alpha = 0.8) +
-geom_density(aes(x = inc_2,
+geom_density(aes(x = inc,
 y = ..density..),col = "red",size = 2,alpha = 0.8) +
 labs(title = "Income of ZU Students") +
 theme_minimal()
@@ -70,14 +83,14 @@ We draw a random sample with size `50` from our population:
 ```{r}
 set.seed(24)
 sample_n <- 50
-sample_2 <- sample(x = inc_2, size = sample_n, replace = F)
+sample <- sample(x = inc, size = sample_n, replace = F)
 ```
 
 
 
 ```{r fig.height=4, fig.width=9}
 ggplot() +
-geom_histogram(aes(x = sample_2,
+geom_histogram(aes(x = sample,
 y = ..density..),binwidth = 50,alpha = 0.8) +
 labs(title = "SAMPLE Histogram Income ZU Students") +
 theme_minimal()
@@ -87,7 +100,7 @@ theme_minimal()
 
 Given the assumption that our population is distributed normally we:
 
-**1. Formulate the Null-Hypothesis that mean student income is less then $940 €$:**
+## Formulate the Null-Hypothesis that mean student income is less then $940 €$
 $$ H_0 : \mu_{inc} < 940  $$
 Which leaves us with the alternative Hypothesis that the mean income is more or equal to $940€$:
 $$ H_1: \mu_{inc} \geq 940 $$
@@ -96,26 +109,23 @@ mu_inc = 940
 mu_inc
 ```
 
-**2. Estimate the mean with the sample mean $\bar{X}$ :**
+## Estimate the mean with the sample mean $\bar{X}$ 
 ```{r}
-inc_bar <- mean(sample_2)
+inc_bar <- mean(sample)
 inc_bar
 ```
 
-**3. Estimate the sampling variance $S^2$ and derive the sampling standard** deviation $S$ :
+## Estimate the sampling standard deviation $S / \sqrt{n}$
 ```{r}
-var(sample_2)
-```
-```{r}
-S_inc <- sd(sample_2)
-S_inc
+S_inc_bar <- sqrt(var(sample)/(sample_n))
+S_inc_bar
 ```
 
 At this state we would expect our sample mean to be distributed like this:
 
 ```{r fig.height=4, fig.width=9}
 ggplot(data =  data.frame(X_bar = 850:1030), aes(x=X_bar)) +
-  stat_function(fun = dnorm, args = list(mean = mu_inc, sd = S_inc/sqrt(sample_n)), size = 2) +
+  stat_function(fun = dnorm, args = list(mean = mu_inc, sd = S_inc_bar), size = 2) +
   geom_vline(xintercept = inc_bar, color = "red", size = 1.5) +
   geom_vline(xintercept = mu_inc, color = "green", size = 1.5) +
   labs(title = "Assumed PDF of our sample mean under H0") +
@@ -123,10 +133,10 @@ ggplot(data =  data.frame(X_bar = 850:1030), aes(x=X_bar)) +
 ```
 
 
-**4. Standardise $\bar{X}$ so we can easily calculate probabilities**
+## Standardise $\bar{X}$ so we can easily calculate probabilities
 
 ```{r}
-Z_inc_bar <- (inc_bar - 940) / (S_inc / sqrt(sample_n))
+Z_inc_bar <- (inc_bar - 940) / (S_inc_bar)
 Z_inc_bar
 ```
 
@@ -141,14 +151,18 @@ ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   theme_minimal()
 ```
 
-**5. Calculate probability of $\bar{X}$ occuring at 10% significance level:**
+## Calculate probability of $\bar{X}$ occuring at 5% significance level
 
-Look up the critical $z-value$ for $1-10\% = 90\%$, e.g. in this [table](http://www.z-table.com/).
-$$ z_{1-\alpha} = 1.65 $$
+Look up the critical $z-value$ for $1-5\% = 95\%$, e.g. in this [table](http://www.z-table.com/).
 
-If we now compare our test statistic against the critical value, we can see that it is greater:
+$$ c = z_{95 \%} \approx 1.65 $$
 
-$$ 1.65 < 2.14 $$
+Or in R:
+```{r}
+qnorm(0.95)
+```
+
+Lets visualise this:
 
 ```{r fig.height=4, fig.width=9}
 ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
@@ -161,19 +175,45 @@ ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
   theme_minimal()
 ```
 
+### Hypothesis Test:
+
+Check whether our standardised estimator $Z_{\bar{inc}}$ is larger than our critical value $c$.
+
+- Critical value $c$: quantile of the standard normal cdf with $P(z > c) = 95 \%$
+- Test statistic: our standardised estimator $Z_{\bar{inc}}$
+
+Remember our $H_0: \mu_{inc} < 940€$ and $H_1: \mu_{inc} \geq 940€$. Lets test that in R:
+
+```{r echo=TRUE}
+Z_inc_bar >= qnorm(0.95)
+```
+
 We now can make the following statements:
 
-- If the $H_0$ is true, samples with a $Z_{inc}$ in the dark grey area only occur $10\%$ of the time
-- In conclusion, we have some evidence against the our initial assumption that mean student income is at most $940 €$
-- This means that we can be optimistic that our sample is not one of th e$10 \%$ of outliers in the world of $H_0$, but that the $H_0$ is wrong
+- If the $H_0$ is true, samples with a $Z_\bar{inc}$ in the dark grey area only occur $5\%$ of the time
+    - We call that area the rejection region
+- We showed that our observed sample mean (in standardised form) falls into the rejection region
+- In conclusion, we have some evidence against our initial assumption that mean student income is at most $940 €$
+- This means that we can be optimistic that our sample is not one of the $5 \%$ of outliers in the world of $H_0$, but that the $H_0$ is wrong
 
-Generally we can make the statement: "we can reject the null hypothesis that mean ZU student income is less than $940€$ at a significance level of $10\%$"
+Generally we can make the statement: "we can reject the null hypothesis that mean ZU student income is less than $940€$ at a significance level of $5\%$"
+
+### Hypothesis Test - Other Possible Variants
+
+What we did was only the *right-sided* hypothesis test. 
+
+We could also test other hypotheses:
+
+- Left-sided: $H_0: \mu_{inc} > 940€$ and $H_1: \mu_{inc} \leq 940€$
+    - Test: $\mu_{inc} \leq c$
+- Both-sided: $H_0: \mu_{inc} = 940€$ and $H_1: \mu_{inc} \neq 940€$
+    - Test :$|\mu_{inc}| > c$
 
 ## P-Values
 
 So called *p-values* are often used and reported in statistical work. They indicate the highest level of significance at which we can reject the $H_0$.
 
-In our example, we could not only reject the $H_0$ at the $10\%$ level, but also at the $5\%$ level:
+In our example, we could not only reject the $H_0$ at the $5\%$ level, but also at the $2.5\%$ level:
 
 ```{r fig.height=4, fig.width=9}
 ggplot(data =  data.frame(Z_inc_bar = -4:4), aes(x=Z_inc_bar)) +
@@ -197,7 +237,17 @@ This is our p-value. It tells us that we can reject the $H_0$ at most at a signi
 
 # T-Test Function in R
 
+In R we can conduct this procedure with the `t.test` function:
+
 ```{r}
-t.test(sample_2, mu = 940, alternative = "greater")
+t.test(sample, mu = 940, alternative = "greater")
 ```
 
+The different p-value is due to the fact that `t.test` used the **Students t-distribution** instead of the standard normal distribution. We used the standard normal for ease of explanation, but actually our test statistic is distributed in the Student-t way.
+
+If we calculate our p-value for the Student-t distribution, we get the same result:
+```{r}
+1- pt(Z_inc_bar, 49) # degrees of freedom = sample size -1 
+```
+
+For large samples ($n > 120$) the t-distribution and the standard normal distribution are almost equivalent.

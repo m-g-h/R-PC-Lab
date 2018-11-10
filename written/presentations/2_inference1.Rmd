@@ -208,14 +208,14 @@ $$ Z_{\bar{inc}} = \frac{\bar{inc} - \mu_{inc}}{\sigma_{inc} / \sqrt{n}} = \frac
 - This helps us to calculate probabilities, since now our estimator is distributed *standard normally*
 
 ## Interval estimation
- $95 \%$ of the values of a standard normal variable lie in the interval $[-1.96, 1.96]$ (see [z-table](http://www.z-table.com/)) or use `qnorm(0.95)` in R
+ $98 \%$ of the values of a standard normal variable lie in the interval $[-1.96, 1.96]$ (see [z-table](http://www.z-table.com/)) or use `qnorm(0.95)` in R
 
 ```{r}
 ggplot(data =  data.frame(X_bar = -4:4), aes(x=X_bar)) +
   stat_function(fun = dnorm, args = list(mean = 0, sd = 1), size = 2) +
-  stat_function(fun = dnorm, xlim = c(-1.96,1.96), geom = "area", fill = "darkgrey", alpha=0.5) +
-  stat_function(fun = dnorm, xlim = c(-4,-1.96), geom = "area", fill = "black", alpha=0.5) +
-   stat_function(fun = dnorm, xlim = c(1.96,4), geom = "area", fill = "black", alpha=0.5) +
+  stat_function(fun = dnorm, xlim = c(-1.28,1.28), geom = "area", fill = "darkgrey", alpha=0.5) +
+  stat_function(fun = dnorm, xlim = c(-4,-1.28), geom = "area", fill = "black", alpha=0.5) +
+   stat_function(fun = dnorm, xlim = c(1.28,4), geom = "area", fill = "black", alpha=0.5) +
   geom_vline(xintercept = (mean(sample_1) - 1000) / (200/sqrt(50)), color = "red", size = 1.5) +
 geom_vline(xintercept = (910 - 1000) / (200/sqrt(50)), color = "blue", size = 1.5) +
   geom_vline(xintercept = 0, color = "green", size = 1.5) +
