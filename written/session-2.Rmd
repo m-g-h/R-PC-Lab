@@ -366,7 +366,7 @@ where $y$ is the regressand and $x$ the regressor. $\epsilon$ denotes the error 
 Basically, a linear regression model is nothing else other than a linear function $y=mx+b$. In the regression case, $\beta_0$ is $b$, and $\beta_1$ is $m$, the slope. The regression line is the one line that crosses or passes the observation with the smallest amount of squared error.
 ```{r echo = FALSE}
 library(ggplot2)
-student_id = c(1,2,3,4,5)
+student_id = c(1,2,3,4,5,6,7,8,9,10)
 x = c(95,85,80,73,70,65,60,58,55,51)
 y = c(85,95,75,70,65,70,62,53,52,51)
 grades_df = data.frame(student_id, x, y)

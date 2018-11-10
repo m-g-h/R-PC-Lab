@@ -1,11 +1,11 @@
 ---
 title: "Simple Linear Regression and OLS"
 output:
-  beamer_presentation:
-    theme: metropolis
-  slidy_presentation: default
   ioslides_presentation:
     widescreen: yes
+  slidy_presentation: default
+  beamer_presentation:
+    theme: metropolis
 ---
 
 ```{r setup, include=FALSE }
@@ -16,13 +16,9 @@ knitr::opts_chunk$set(fig.width=10)
 
 ## Contents and Goals
 
-- Get to know the basic features of probability distributions
-    - Mean / Expected Value
-    - Variance and Standard Deviation
-    - Covariance and Correlation
-    - Standardisation
-- Learn how they work
-- Learn how we can manipulate them
+- Get to know the Simple Linear Regression Model (SLM)
+    - Economic and Statistical interpretation
+    - Ordinary Least Squares
 
 ## Linear Regression
  - Predict one variable from another: One simple way to do so is using linear regression (SLR)
@@ -63,11 +59,18 @@ round(sum(resid))
 $$\hat{econgrade} = \hat{\beta_0} + \hat{\beta_1}statsgrade + \hat{\epsilon}$$
  - The hats $\hat{}$ are used because we look at empirical data, and we can only *estimate* a model, but not claim that we have an image of the theoretical model here
 
----
+--- 
+- open R and type the following code to get the data of the graph below
+```{r echo=TRUE, results="hide"}
+student_id = c(seq(1:10))
+x = c(95,85,80,73,70,65,60,58,55,51)
+y = c(85,95,75,70,65,70,62,53,52,51)
+grades_df = data.frame(student_id, x, y)
+```
 
-```{r fig.height=4, fig.width=9}
+```{r echo=FALSE, fig.height=4, fig.width=9}
 library(ggplot2)
-student_id = c(1,2,3,4,5)
+student_id = c(seq(1:10))
 x = c(95,85,80,73,70,65,60,58,55,51)
 y = c(85,95,75,70,65,70,62,53,52,51)
 grades_df = data.frame(student_id, x, y)
@@ -76,11 +79,17 @@ ggplot(grades_df, aes(x, y)) +
     method="lm", colour="red", se=T, alpha=0.1) + theme_minimal()
 ```
 
-```{r echo = TRUE}
-summary(lm(y~x, data=grades_df))$coefficients
+--- 
+
+ - Now we want to compose a linear model in r:
+```{r echo=TRUE}
+m1 = lm(y~x, data=grades_df)
+summary(m1)
 ```
- - Clear linear relationship between the students' statistics grades and the econometrics grades. 
+ - Graph: Clear linear relationship between the students' statistics grades and the econometrics grades. 
  - By how much does a student's Econometrics grade increase if the student's Statistics grade was better by one? 
+ 
+---
 ```{r echo = TRUE}
 summary(lm(y~x, data=grades_df))$coefficients
 ```
@@ -93,7 +102,7 @@ summary(lm(y~x, data=grades_df))$coefficients
 
 ---
 
- - Essential problem with this interpretation: Do we have a causal relationship or just a correlation? Do we know that the line we drew is the best guess for a prediction?
+ - Essential problem with this interpretation: How do we know that the line we drew is the best guess for a prediction? And do we have a causal relationship or just a correlation?
 
 ## Ordinary least squares
  -  Regression line = line that fits our points so that it minimises the squared deviations (residuals) of the points from the line. 
@@ -121,6 +130,27 @@ $$\begin{aligned}&2\times\sum_{i=1}^n-x_i(y_i-\hat{\beta}_0-\hat{\beta}_1x_i) \s
 \iff & \sum_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})=\hat{\beta_1}\sum_{i=1}^n(x_i-\bar{x})^2\\
 \iff & \hat{\beta_1} = \frac{\sum_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^n(x_i-\bar{x})^2} = \frac{Cov[x,y]}{Var[x]}
 \end{aligned}$$
+
+## Law of Iterated Expectations
+ - Please refer to the course manual (script)
+
+## Causal interpretation
+ - For a regression to be more than a simple correlation, one has to make assumptions how $x$ is related to the error term $\epsilon$. 
+ - For causal interpretations, $x$ must not include information about $\epsilon$, (they must not be correlated).
+    - If correlated, something else than $x$ may predict $y$. Mathematically speaking: $$\mathbb{E} \left[\epsilon|x\right] = 0$$
+ - = **zero conditional mean assumption**. If it holds, we have **exogeneity**. 
+ - Do we have exogeneity in our Statistics / Econometrics grade example?
+
+---
+
+ - Following from this and the Law of Iterated Expectations: 
+ $$\begin{aligned}\mathbb{E} \left[\epsilon|x\right] &= \mathbb{E}\left[\epsilon\right] = 0\text{,}\end{aligned}$$
+ - therefore: 
+ $$\begin{aligned}Cov\left[x, \epsilon\right] &= \mathbb{E}\left[x\epsilon\right] - \mathbb{E}\left[X\right] \mathbb{E}\left[\epsilon\right]  = 0\end{aligned}$$
+
+ - Then, the value of $y$ can be expressed as a linear function of $x$:
+$$\begin{aligned}\mathbb{E}\left[y|x\right] &= \mathbb{E}\left[\beta_0 + \beta_1x + \epsilon|x\right] \\ &= \beta_0 + \beta_1x + \mathbb{E}\left[\epsilon|x\right] \\ &= \beta_0 + \beta_1x \end{aligned}$$
+
 
 ## Assumptions
 
