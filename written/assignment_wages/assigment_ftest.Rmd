@@ -1,0 +1,32 @@
+---
+title: "F-Test Excercises"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Testing Multiple Linear Restrictions: F-Test
+
+In this excercise, we work with the following model:
+
+$$ WAGE = \beta_0 + \beta_1 SCORES + \beta_2 EXPER + \beta_3 TENURE + \beta_4IQ  + \beta_5 EDUC + \beta_6 AGE + \varepsilon  $$
+
+***
+
+1. **F-Test for Overall Significance**. Estimate the model described above and interpret its results.What does the F-Test in the output of  `summary()` tell us?
+    - Consider which model in this case is restricted, which one is unrestricted
+
+***   
+
+
+2. **Hypotheses about groups**. Test the joint hypotheses that when performance related variables are controlled for, variables related to the person are not significant. Set up the appropriate models (restricted and unrestricted) and conduct the F-test as:
+    - `AGE`, `EDUC` and`IQ`, are not significant if we control for
+    - `SCORES`, `EXPER` and `TENURE`
+
+***
+
+3. **Functional Form**. Often it is assumed that certain variables follow a certain functional form, e.g. a quadratic trend. If we include a quadratic term of `AGE` in the model, we can use a F-test to test for the general significance of `AGE`.
+    - Include a quadratic term for `AGE`, i.e. $\beta_6AGE + \beta_7AGE^2$ in the model
+    - Test the joint hypothesis that the quadratic form of `AGE` has no effect on `WAGE`
