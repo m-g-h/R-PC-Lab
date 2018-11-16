@@ -380,7 +380,7 @@ Lets take a look at the residuals:
 resid = summary(lm(y~x, data=grades_df))$residuals; resid
 round(sum(resid))
 ```
-Look at the graph. The rightmost point deviates by $-7.03$ (the first entry of our residuals), the second by $12.36$ etc.
+Look at the graph. The rightmost point (student ) deviates by $-7.03$ (the first entry of our residuals), the second by $12.36$ etc.
 
 Usually, researchers are interested in the amount of change in $y$ that occur when $x$ changes. As in any linear function, the rate of change is given by $\beta_1$. More formally: $$\frac{\delta y}{\delta x} = \beta_1$$
 
