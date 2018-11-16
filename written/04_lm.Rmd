@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = F)
 ## Workflow
 
 ```{r echo=FALSE}
-DiagrammeR::grViz("figure/lm-modelling.gv", width=1000, height = 400)
+DiagrammeR::grViz("figure/lm-modelling.gv", width=900, height = 400)
 ```
 
 ## The `lm` Function
@@ -280,8 +280,3 @@ If the $H_0$ is true, our test statistic follows the $F-Distribution$ and we can
 ```{r echo=TRUE}
 anova(model3, model4)
 ```
-
-
-
-
-
