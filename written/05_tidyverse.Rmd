@@ -1,0 +1,256 @@
+---
+title: "Data Management and the tidyverse"
+output:
+  ioslides_presentation:
+    widescreen: yes
+    slide_level: 2
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: no
+---
+```{r echo = F}
+knitr::opts_chunk$set(echo = F)
+```
+
+# Loading Datasets
+    
+<style>
+  .column-left {
+    float: left;
+    width: 50%;
+    text-align: left;
+  }
+  .column-right {
+    float: right;
+    width:50%;
+    text-align: left;
+  }
+</style>
+
+---
+
+  - Before beginning data analysis, the data to be analysed has to be loaded into the R environment. There are several ways to do so:
+    1. Manually enter data in R (not recommended)
+    2. Loading data from other formats such as .csv, .txt, .sav (SPSS), etc.
+    3. Working with databases (not covered here)
+    4. Using inbuilt datasets
+
+## Entering Data manually
+
+  - Example for the first method:
+```{r echo=TRUE}
+student_name <- c("Hans", "Peter",
+                  "Anna", "Hanna") # Creating a vector of names
+student_sex <- c("m", "m", "w", "w") # Creating a vector of sexes
+student_grade <- c(2.3, 3.8, 1.2, 2.2) # Creating a vector of grades
+# Merging the three vectors into a data frame
+student_df <- data.frame(name=student_name, sex=student_sex, 
+                         grade=student_grade) 
+print(student_df)
+```
+
+## Inbuilt datasets
+ - R also has lots of inbuilt datasets, of which the most famous ones are:
+    - `mtcars`: Motor Trend Car Road Tests
+    - `iris`: Edgar Anderson's Iris Data
+ - The inbuilt datasets are easily accessed by just calling them. A complete list is available by calling `library(help="datasets")`
+
+```{r echo = TRUE}
+mydf <- mtcars # assigning the mtcars to the variable 'df'
+head(mydf[,1:6],4) # Printing the first 5 rows (and 6 columns)
+```
+
+
+## Importing data
+ - The most common situation is that you have an existing format in another file format. Usually, those are comma-separated text files (CSV) or datasets processed by other statistical software.
+ - To import data from other formats, we need to specifiy in R from which format we are reading. In the case of CSV, this is simple:
+```{r echo =TRUE}
+mydf <- read.csv("data/class_data_comma.csv") # Reading data from csv
+names(mydf) <- c("Name", "Studies", "Study_hours", # Assigning
+                 "Alevels", "Stat_know", "Prosp_Grade") # new column names
+head(mydf, 3)
+```
+
+---
+
+ - But look what happens if we try to read the semicolon-separated file:
+```{r echo = TRUE, error=TRUE}
+mydf <- read.csv("data/class_data_semi.csv")
+```
+ - We need to tell R the separator of the single data table cells from each other. For csv, the remedy for semicolon-separated files is simple:
+```{r echo = TRUE}
+mydf <- read.csv2("data/class_data_semi.csv")
+names(mydf) <- c("Name", "Studies", "Study_hours",
+                 "Alevels", "Stat_know", "Prosp_Grade"); head(mydf, 3)
+```
+
+---
+
+ - To finish this chapter, we import data from the SPSS file format .sav. Since base R does not have a function to handle this format, we will need the `haven` library.
+```{r echo = TRUE}
+library(haven)
+mydf <- read_spss("data/democracy.sav") # Loading the Democracy dataset
+# Selecting only three variables
+mydf <- subset(mydf, select=c("Nation", "Religion", "Catholic"))
+head(mydf, 3)
+```
+ - Here, we are selecting three variables using the `subset` command because the Democracy dataset comprises 2787 variables.
+
+# The Tidyverse
+
+---
+
+ - The tidyverse is a collection of R packages designed for data science.
+```{r echo = TRUE}
+library(tidyverse)
+```
+ 
+## Data Management using the tidyverse
+ - As you can see, the tidyverse loads a list of packages:
+    - `ggplot` for graphics
+    - `tibble` for cooler dataframes
+    - `tidyr` for data tidying
+    - `readr` for importing data
+    - `purrr` for functional programming
+    - `dplyr` for data manipulation
+    - `stringr` for string manipulation
+    - `forcats` for easier factor handling.
+ - In this tutorial, we will use the `flights` dataset from the `nycflights13` package.
+
+## The Pipe
+ - A central operator within the tidyverse is the "pipe" operator `%>%`
+ - The pipe takes an input in front of it and pushes it in the function that follows after the pipe. It is effectively acting like a Pipe. It can also be imagined like an assembly line.
+ - $f(g(x))$ is the same as
+```{r error=TRUE, eval=FALSE, echo=TRUE}
+x %>% g() %>% f()
+```
+
+---
+
+```{r echo = TRUE, results = FALSE}
+tutors <- c("Bene", "Marcel", "Martin", "Ben")
+```
+<div class="column-left">
+ - Standard nested functions
+```{r echo = TRUE}
+length(tutors)
+nchar(tutors)
+max(nchar(tutors))
+```
+</div>
+<div class="column-right">
+ - Using the pipe
+```{r echo = TRUE}
+tutors %>% length()
+tutors %>% nchar()
+tutors %>% nchar() %>% max()
+```
+</div>
+
+---
+
+ - Let us have a quick look at a better dataframe format. Instead of using base R's `data.frame()`, we will use dplyr's `data_frame()`.
+ 
+```{r echo = TRUE}
+mydf <- data_frame(name=c("Hans", "Peter", "Anna", "Hanna"),
+                   sex=c("m", "m", "w", "w"),
+                   grade = c(2.3, 3.8, 1.2, 2.2))
+```
+<div class="column-left">
+```{r}
+# Print the dataframe
+head(mydf, 2)
+```
+</div>
+<div class="column-right">
+```{r echo = TRUE}
+# Checking dimensions
+mydf %>% dim() # (rows x cols)
+```
+</div>
+<div style="clear:both;">
+```{r echo = TRUE}
+mydf %>% glimpse() # Get a glimpse of the dataframe
+```
+</div>
+
+--- 
+
+ - The pipe gives us the possibility to make our code more readable, but it does not really make things necessarily easier right now, at least not for data manipulation.
+ - This is where `dplyr`'s functions come into play:
+    - `filter()` filters the rows of a table by one or more conditions
+    - `select()` selects the specified columns
+    - `mutate()` creates new variables or changes existing ones
+    - `arrange()` sorts by a column
+    - `group_by()` enables data manipulation of groups within the dataframe
+ - Now let's do some data manipulation!
+ 
+---
+
+```{r echo=T}
+# install.packages("nycflights13")
+library(nycflights13) # Loading the flights dataset
+flights %>% glimpse(width = 80)
+```
+
+## Data manipulation with `dplyr`
+ - This exemplifies the beauty of dplyr and the `%>%` operator
+
+```{r echo=T, results=F}
+flights %>% 
+  select(-arr_time, -dep_time, 
+         -sched_dep_time, -sched_arr_time) %>%  # Dropping columns
+  filter(distance >= 500) %>%  # Selecting flights with at least 500 miles distance
+  filter(!is.na(arr_delay)) %>%  # Selecting flights where delay information is available
+  group_by(carrier) %>% # Grouping by carrier
+  summarise(mean_delay = mean(arr_delay)) %>% # Calculating the mean arrival
+                                              # delay for each carrier
+  arrange(desc(mean_delay)) %>% # arrange by delay in descending order
+  mutate(punctual = ifelse(mean_delay<5, # Create a new variable "punctual" and assign
+                           "usually on time", # "on time" if mean delay is less than 5
+                           "usually delayed")) %>%  # and "delayed", if it is greater
+  filter(punctual == "usually on time") %>% # keep only the carriers that are on time
+  arrange(mean_delay) # ...and sort them in ascending order
+```
+
+---
+
+```{r echo=F}
+flights %>% 
+  select(-arr_time, -dep_time, 
+         -sched_dep_time, -sched_arr_time) %>%  # Dropping columns
+  filter(distance >= 500) %>%  # Selecting flights with at least 500 miles distance
+  filter(!is.na(arr_delay)) %>%  # Selecting flights where delay information is available
+  group_by(carrier) %>% # Grouping by carrier
+  summarise(mean_delay = mean(arr_delay)) %>% # Calculating the mean arrival
+                                              # delay for each carrier
+  arrange(desc(mean_delay)) %>% # arrange by delay in descending order
+  mutate(punctual = ifelse(mean_delay<5, # Create a new variable "punctual" and assign
+                           "usually on time", # "on time" if mean delay is less than 5
+                           "usually delayed")) %>%  # and "delayed", if it is greater
+  filter(punctual == "usually on time") %>% # keep only the carriers that are on time
+  arrange(mean_delay) # ...and sort them in ascending order
+```
+
+- To understand the whole procedure step by step, it is advisable to execute the code line by line, excluding the concluding `%>%` for each line.
+
+- **Exercise**: Open the tidyverse assignment sheet. See if you can solve it using the `%>%` operator and the `dplyr` commands!
+
+## Dplyr commands
+```{r echo=T, results=F}
+flights %>% 
+  select(-arr_time, -dep_time, 
+         -sched_dep_time, -sched_arr_time) %>%  # Dropping columns
+  filter(distance >= 500) %>%  # Selecting flights with at least 500 miles distance
+  filter(!is.na(arr_delay)) %>%  # Selecting flights where delay information is available
+  group_by(carrier) %>% # Grouping by carrier
+  summarise(mean_delay = mean(arr_delay)) %>% # Calculating the mean arrival
+                                              # delay for each carrier
+  arrange(desc(mean_delay)) %>% # arrange by delay in descending order
+  mutate(punctual = ifelse(mean_delay<5, # Create a new variable "punctual" and assign
+                           "usually on time", # "on time" if mean delay is less than 5
+                           "usually delayed")) %>%  # and "delayed", if it is greater
+  filter(punctual == "usually on time") %>% # keep only the carriers that are on time
+  arrange(mean_delay) # ...and sort them in ascending order
+```
