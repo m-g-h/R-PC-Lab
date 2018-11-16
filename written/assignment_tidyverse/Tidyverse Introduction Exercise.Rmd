@@ -1,0 +1,43 @@
+---
+title: "Using the tidyverse"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Dplyr Queries
+Use the `flights` dataset from `nycflights13` for the following exercises:
+```{r}
+# install.packages("nycflights13")
+library(nycflights13) # Loading the flights dataset
+```
+
+***
+
+1. Find the long-distance flights (>2500 miles) that departed in spring 2013.
+
+***
+
+2. Sort the flights by day of the month (ascending) and departure delay (descending)
+
+***
+
+3. Select the carrier and the tail-number of the flights.
+
+***
+
+4. Create a unique ID for each flight and calculate the flight-distance in kilometers (distance is reported in miles).
+
+***
+
+5. Find the minimum, average, and maximum arrival-delay for all flights.
+
+***
+
+6. For each flight, find the difference of the arrival-delay to the average arrival-delay of the respective airline (carrier).
+
+***
+
+7. For each airline, find the mean and median arrival over all flights of 2013.

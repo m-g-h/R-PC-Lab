@@ -16,3 +16,4 @@ vignettes/*.pdf
 .httr-oauth
 written/data/ISSP.dta
 written/data/democracy.sav
+written/data/bla.xlsx

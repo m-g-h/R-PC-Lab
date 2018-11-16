@@ -2,8 +2,9 @@
 title: "Data Management and the tidyverse"
 output:
   ioslides_presentation:
-    widescreen: yes
     slide_level: 2
+    widescreen: yes
+  slidy_presentation: default
   html_document:
     number_sections: yes
     toc: yes
@@ -105,7 +106,18 @@ head(mydf, 3)
 ```{r echo = TRUE}
 library(tidyverse)
 ```
- 
+
+## Organising Data in a standardized way
+"tidy datasets are all alike but every messy dataset is messy in its own way"
+- Hadley Wickham
+
+And that's why we want tidy data!
+![](figure/tidy.png)
+<br />
+
+
+
+
 ## Data Management using the tidyverse
  - As you can see, the tidyverse loads a list of packages:
     - `ggplot` for graphics
@@ -186,16 +198,88 @@ mydf %>% glimpse() # Get a glimpse of the dataframe
     - `group_by()` enables data manipulation of groups within the dataframe
  - Now let's do some data manipulation!
  
----
+## `filter()`
+<div style="float:left;width:60%;">
+```{r echo=T}
+(x <- data_frame(id=c(1:7), 
+                 group=c(rep(c("a","b"),3),"a")))
+```
+</div><div style="float:right;width:40%;">
+```{r echo=T}
+x %>% 
+  filter(group=="a")
+```
+</div><div style="clear:both">
+ - The `filter()` command filters row-wise according to one or more criteria. Criteria can be linked by using either the "OR" operator `|` or the "AND" operator `&`.
+</div>
 
+## `select()`
+<div style="float:left;width:60%;">
+```{r echo=T}
+x %>% select(group)
+```
+</div><div style="float:right;width:40%;">
+```{r echo=T}
+x %>% select(-group)
+```
+</div><div style="clear:both">
+ - The `select()` command selects columns as specified. Selecting multiple columns is done by separating the column names with commas. Deselecting columns using a "-" like in the example is also possible. `startswith()` can be useful when selecting multiple variables with the same prefix.
+</div>
+
+## `mutate()`
+<div class="column-left">
+```{r echo=T}
+x %>% mutate(log_id=log(id))
+```
+</div><div class="column-right">
+```{r echo=T}
+x %>% mutate(group=ifelse(id<=4, "a", "b"))
+```
+</div><div style="clear:both">
+ - The `mutate()` command creates new variables or changes existing ones. Like in the example, existing variables can be part of the new variable declaration. In the example, for the new variable "log_id" each row of the id column is logarithmised. With `ifelse()`, it is possible to mutate variables on a condition.
+</div>
+
+## `arrange()`
+<div style="float:left;width:60%;">
+```{r echo=T}
+x %>% arrange(group)
+```
+</div><div style="float:right;width:40%;">
+```{r echo=T}
+x %>% arrange(desc(id))
+```
+</div><div style="clear:both">
+ - The `arrange()` command sorts the dataframe by the specified column. calling `desc()` on the column will make `arrange()` sorting in descending order. Hierarchical sorting is possible by passing more than one variable into `arrange()`.
+</div>
+
+## `group_by()`
+<div style="float:left;width:50%;">
+```{r echo=T}
+x %>% group_by(group) %>%
+  mutate(no_obs=n())
+```
+</div><div style="float:right;width:50%;">
+```{r echo=T}
+x %>% group_by(group) %>% 
+  summarise(sum_id=sum(id))
+```
+</div><div style="clear:both">
+ - Grouping variables is useful if operations should be executed group-wise. The `n()` command counts the rows in the current group context. `summarise()` summarises information in the current group context with the given function.
+</div>
+
+## Exercise Time
+ - Now open and solve the tidyverse introduction exercises!
+
+## Example using `dplyr` and pipes
 ```{r echo=T}
 # install.packages("nycflights13")
 library(nycflights13) # Loading the flights dataset
 flights %>% glimpse(width = 80)
 ```
 
-## Data manipulation with `dplyr`
- - This exemplifies the beauty of dplyr and the `%>%` operator
+---
+
+The beauty of dplyr becomes apparent when performing operation like the following.
 
 ```{r echo=T, results=F}
 flights %>% 
