@@ -54,4 +54,17 @@ Germany %>%
   group_by(sex) %>% 
   summarise(percHighInc=mean(highInc, na.rm=T)) %>% 
   arrange(percHighInc)
-  
+
+Australia_raw <- ISSP %>% 
+  filter(V3==36)
+AUSGER <- bind_rows(Australia_raw, Germany_raw)
+
+Germany <- bind_cols(Germany, Germany_raw["degree"])
+
+
+randomData <- data_frame(ID=1:nrow(Germany), 
+                         rand=sample(1:1000, nrow(Germany), replace=T))
+Germany <- Germany %>% 
+  mutate(ID=1:n())
+
+Germany <- left_join(Germany, randomData, by="ID")

@@ -28,3 +28,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ***
 
 4. Have a look at the share of men and women who have a "high income". Of all men, what is the percentage of men with a high income? And of all women, what is the percentage of women with a high income? Use `group_by()` and `summarise()` to calculate the mean of the "highInc" variable within each group. Finally, arrange the resulting table by your percentage variable (ascending). 
+
+*** 
+
+5. 
+    a. Define a new variable "Australia_raw" and filter the ISSP dataset so that it only contains observations from Australia (V3==36). Then use `bind_rows()` to merge it with the existing Germany_raw dataframe. Store this merged dataframe into the variable "AUSGER" (don't worry about the warnings).
+    b. You notice that you have forgotten a column for your "Germany" dataframe. Use `bind_cols()` to paste the "degree" column of the "Germany_raw" dataframe onto the "Germany" dataframe and store it in the variable "Germany"!
+    c. Use `mutate()` to generate a new "ID" column with a running index (1,2,...,`n()`) for your "Germany" dataframe. Then use the following code to generate a dataframe comprising random data:
+```{r echo=T, eval=F}
+randomData <- data_frame(ID=1:nrow(Germany), 
+                         rand=sample(1:1000, nrow(Germany), replace=T))
+```
+Now use `left_join` to join your "Germany" and "randomData" dataframes by the ID column!

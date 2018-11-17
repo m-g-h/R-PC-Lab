@@ -9,9 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="Ben Thies" />
 
-<meta name="date" content="2018-11-16" />
 
 <title>Using the tidyverse</title>
 
@@ -125,8 +123,6 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Using the tidyverse</h1>
-<h4 class="author"><em>Ben Thies</em></h4>
-<h4 class="date"><em>16 November 2018</em></h4>
 
 </div>
 
@@ -155,6 +151,17 @@ $(document).ready(function () {
 <ol start="4" style="list-style-type: decimal">
 <li>Have a look at the share of men and women who have a “high income”. Of all men, what is the percentage of men with a high income? And of all women, what is the percentage of women with a high income? Use <code>group_by()</code> and <code>summarise()</code> to calculate the mean of the “highInc” variable within each group. Finally, arrange the resulting table by your percentage variable (ascending).</li>
 </ol>
+<hr />
+<ol start="5" style="list-style-type: decimal">
+<li><ol style="list-style-type: lower-alpha">
+<li>Define a new variable “Australia_raw” and filter the ISSP dataset so that it only contains observations from Australia (V3==36). Then use <code>bind_rows()</code> to merge it with the existing Germany_raw dataframe. Store this merged dataframe into the variable “AUSGER” (don’t worry about the warnings).</li>
+<li>You notice that you have forgotten a column for your “Germany” dataframe. Use <code>bind_cols()</code> to paste the “degree” column of the “Germany_raw” dataframe onto the “Germany” dataframe and store it in the variable “Germany”!</li>
+<li>Use <code>mutate()</code> to generate a new “ID” column with a running index (1,2,…,<code>n()</code>) for your “Germany” dataframe. Then use the following code to generate a dataframe comprising random data:</li>
+</ol></li>
+</ol>
+<pre class="r"><code>randomData &lt;- data_frame(ID=1:nrow(Germany), 
+                         rand=sample(1:1000, nrow(Germany), replace=T))</code></pre>
+<p>Now use <code>left_join</code> to join your “Germany” and “randomData” dataframes by the ID column!</p>
 </div>
 
 
