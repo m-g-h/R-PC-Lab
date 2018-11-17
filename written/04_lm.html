@@ -96,8 +96,8 @@
 
 </article></slide><slide class=""><hgroup><h2>Workflow</h2></hgroup><article  id="workflow">
 
-<div id="htmlwidget-180404c049aedf17c1a1" style="width:1000px;height:400px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-180404c049aedf17c1a1">{"x":{"diagram":"digraph {\n\n  rankdir=LR\n\n  # a \"graph\" statement\n  node[shape = note margin=0.25]\n  graph [overlap = true, fontsize = 10]\n\n   formula [label = \"Model Formula\"]\n\n  node[shape = hexagon]\n    lm [label = \"Fit Model \\n lm()\"]\n  \n  node [shape = cylinder]\n    data [label = \"Data\"]\n    \n    out [label = \"lm - Output\"]\n    \n  node [shape = box]\n  \n    inspect [label = \"Inspect & Plot\"]\n    evaluate [label = \"Evaluate\"]\n    export [label = \"Display & Export\"]\n\n  data -> lm\n  formula -> lm\n  \n  lm -> out\n  \n  out -> evaluate\n  out -> inspect\n  out -> export\n\n\n  # several \"edge\" statements\n\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4739bc3b719454f164ad" style="width:900px;height:400px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4739bc3b719454f164ad">{"x":{"diagram":"digraph {\n\n  rankdir=LR\n\n  # a \"graph\" statement\n  node[shape = note margin=0.25]\n  graph [overlap = true, fontsize = 10]\n\n   formula [label = \"Model Formula\"]\n\n  node[shape = hexagon]\n    lm [label = \"Fit Model \\n lm()\"]\n  \n  node [shape = cylinder]\n    data [label = \"Data\"]\n    \n    out [label = \"lm - Output\"]\n    \n  node [shape = box]\n  \n    inspect [label = \"Inspect & Plot\"]\n    evaluate [label = \"Evaluate\"]\n    export [label = \"Display & Export\"]\n\n  data -> lm\n  formula -> lm\n  \n  lm -> out\n  \n  out -> evaluate\n  out -> inspect\n  out -> export\n\n\n  # several \"edge\" statements\n\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 
 </article></slide><slide class=""><hgroup><h2>The <code>lm</code> Function</h2></hgroup><article  id="the-lm-function">
 
