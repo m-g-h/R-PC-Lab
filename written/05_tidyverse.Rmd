@@ -108,8 +108,7 @@ library(tidyverse)
 ```
 
 ## Organising Data in a standardized way
-"tidy datasets are all alike but every messy dataset is messy in its own way"
-- Hadley Wickham
+    "tidy datasets are all alike but every messy dataset is messy in its own way" - Hadley Wickham
 
 And that's why we want tidy data!
 ![](figure/tidy.png)
